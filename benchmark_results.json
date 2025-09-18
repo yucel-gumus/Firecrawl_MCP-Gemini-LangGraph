@@ -1,18 +1,18 @@
-[
+[ 
   {
-    "timestamp": "2025-09-18T10:34:31.221639",
-    "url": "https://mertcobanov.medium.com/environment-variables-nedir-python-dotenv-kullan%C4%B1m%C4%B1-0c737a9731b1",
+    "timestamp": "2025-09-18T11:06:42.210048",
+    "url": "https://mertcobanov.medium.com/%C3%BCretken-yapay-zeka-sanat%C4%B1-generative-art-0062b22cb09a",
     "durations": {
-      "llm_init_seconds": 0.026,
-      "tools_load_seconds": 0.688,
-      "agent_init_seconds": 0.005,
-      "scraping_seconds": 1.476,
-      "llm_processing_seconds": 25.726,
-      "total_seconds": 27.924
+      "llm_init_seconds": 0.027,
+      "tools_load_seconds": 0.768,
+      "agent_init_seconds": 0.006,
+      "scraping_seconds": 5.739,
+      "llm_processing_seconds": 31.106,
+      "total_seconds": 37.647
     },
     "content_stats": {
-      "scraped_content_length": 26375,
-      "summary_length": 1869
+      "scraped_content_length": 38707,
+      "summary_length": 5276
     },
     "success": true,
     "error": null

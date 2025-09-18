@@ -1,22 +1,42 @@
 {
   "main_points": [
-    "Yazılımcılar API anahtarları, şifreler gibi hassas bilgileri güvenli bir şekilde yönetmelidir.",
-    "`python-dotenv` kütüphanesi, bu tür hassas verileri kaynak kodundan ayrı tutarak güvenli bir şekilde yönetmeyi sağlar.",
-    "Hassas bilgiler, `KEY=VALUE` formatında `.env` adlı düz metin dosyalarında saklanır.",
-    "Bu yöntem, kimlik bilgilerini doğrudan kodda saklamaktan daha güvenlidir ve sızıntıları önler.",
-    "`python-dotenv` kurulduktan sonra, `load_dotenv()` fonksiyonu ile `.env` dosyasındaki değişkenler yüklenir ve `os.getenv()` veya `os.environ[]` ile erişilir.",
-    "`.env` dosyaları, hassas verilerin yanlışlıkla bir depoya yüklenmesini önlemek için genellikle `.gitignore` dosyasına eklenmelidir."
+    "Üretken yapay zeka sanatı, son 5 yılın en ilginç konularından ve 2023'ün en önemli teknolojilerinden biri olmuştur.",
+    "Yapay zeka geliştiricileri ile geleneksel sanatçıları ikiye ayırmış ve yeni regülasyonlar gerektirmiştir.",
+    "Kullanıcılar, yapay zeka ile oluşturulan ve gerçek görüntüleri ayırt etmekte zorlanmaktadır.",
+    "Yapay zekanın doğal dil ve görsel algılamadaki ilerlemesi, 2017'deki 'Attention Is All You Need' makalesi ve 'Diffusion Mimarisi' ile mümkün olmuştur.",
+    "Üretken sanat, 1960'lı yıllardan beri var olup, bilgisayarla oluşturulan geometrik şekiller ve algoritmik çıktılarla başlamıştır.",
+    "Vera Molnar gibi öncüler, bilgisayarı sanatsal üretimde kullanan ilk kadınlardandır.",
+    "Üretken sanatta eserin sahibinin kim olduğu (yazılımcı, algoritma veya sanatçı) tartışmalı bir konudur.",
+    "Günümüz yapay zeka teknolojisi, Turing testlerini geçebilen eserler üretebilmekte ve bunun için yüksek bilgisayar gücü, matematik, istatistik bilgisi ve sanatsal ruh gerektirmektedir.",
+    "Üretici yapay zeka, yazı, görsel, ses gibi farklı formatlarda medya üreten modelleri tanımlar ve genellikle görsel alanla ilişkilendirilir.",
+    "AICAN, Rutgers Üniversitesi tarafından geliştirilen ve yeni sanat tarzlarını keşfetme ve yaratma kabiliyetine sahip öncü bir üretken yapay zeka modelidir.",
+    "OpenAI'nin CLIP mimarisi, görselleri ve tanımlamaları eşleştiren, metinden görsel ve görselden metin üretimine olanak tanıyan önemli bir yeniliktir.",
+    "GAN'ler (Üretken Çekişmeli Ağlar), üreteç ve ayırt edici olmak üzere iki sinir ağından oluşur ve gerçekçi veri örnekleri üretmek için rekabet eder.",
+    "GAN modellerini CLIP ile kontrol etme fikri, kararlı difüzyon gibi günümüz tekniklerinin temelini oluşturmuştur.",
+    "Diffusion (Yayılım) mimarisi, üretken yapay zeka sanatının altın çağını başlatmış, Midjourney ve Stable Diffusion gibi araçlarla basit cümlelerden görseller oluşturmayı sağlamıştır.",
+    "Stable Diffusion modeli, VAE, Tokenizer ve Metin Kodlayıcı, UNet ve Zamanlayıcı gibi karmaşık bileşenleri entegre eder.",
+    "Diffüzyon sürecinin amacı, fotoğraflara gürültü ekleyip modelin bu gürültüyü kaldırmayı öğrenmesini sağlamaktır; gürültü ekleme süreci lineer olmayan bir şekilde gerçekleşir.",
+    "Metin Koşullandırması ve Classifier Free Guidance (CFG) gibi teknikler, modelin metne uygun ve dengeli görsel çıktılar üretmesini sağlar.",
+    "Üretken sanat, ne tamamen geleneksel bir sanat ne de sadece bir programlama disiplinidir; sanat, teknoloji, matematik ve insan duygularının kesiştiği, sürekli evrilen bir alandır."
   ],
   "statistics": [
-    "Makalenin okuma süresi: 2 dakika.",
-    "Makalenin yayınlanma tarihi: 30 Eylül 2024.",
-    "Makale ile ilgili etkileşim sayısı: 6.",
-    "Örnek bir `.gitignore` dosyasında `.env` dosyalarının dışlandığı satırlar: 100 ve 113."
+    "son 5 yılın",
+    "2023'ün",
+    "2017 yılında",
+    "1960'lı yıllardan bu yana",
+    "1960 ve 1965 yılları arasında",
+    "1924 doğumlu",
+    "100 yaşına bir hafta kala",
+    "2023 Aralık ayında",
+    "512x512x3 boyutundaki",
+    "64x64x4 boyutuna"
   ],
   "key_findings": [
-    "`python-dotenv`, Python projelerinde hassas bilgilerin güvenli bir şekilde yönetilmesi için temel bir araçtır.",
-    "Kütüphane, kimlik bilgilerini kaynak kodundan ayırarak yanlışlıkla ifşa edilmesini engeller.",
-    "`.env` dosyalarının `.gitignore`'a dahil edilmesi, sürüm kontrol sistemlerinde güvenlik sağlamak için kritik öneme sahiptir.",
-    "Bu yaklaşım, geliştiricilerin hassas verilere kolayca erişmesini sağlarken aynı zamanda güvenlik standartlarını korur."
+    "Üretken yapay zeka sanatı, son yılların en önemli teknolojik gelişmelerinden biri olup, sanat dünyasında ve toplumda önemli tartışmalara ve regülasyon ihtiyaçlarına yol açmıştır.",
+    "Modern üretken yapay zeka sanatının temelleri, 2017'deki 'Attention Is All You Need' makalesi ve 'Diffusion Mimarisi' gibi yenilikçi teknolojilere dayanmaktadır.",
+    "Vera Molnar gibi öncü sanatçılar, bilgisayarı sanatsal üretimde kullanarak üretken sanatın erken dönemlerini şekillendirmişlerdir.",
+    "AICAN, CLIP ve GAN'ler gibi yapay zeka modelleri, metinden görsel üretimi ve yeni sanat tarzlarının keşfi gibi yeteneklerle üretken sanatın gelişiminde kritik rol oynamıştır.",
+    "Stable Diffusion gibi difüzyon modelleri, karmaşık matematiksel ve algoritmik süreçler kullanarak, basit metin komutlarından yüksek kaliteli ve benzersiz görseller oluşturarak üretken yapay zeka sanatını geniş kitlelere ulaştırmıştır.",
+    "Üretken sanat, sanat ve teknolojinin kesişiminde yer alan, insan ve makine yaratıcılığı arasındaki sınırları zorlayan, sürekli gelişen ve çok yönlü bir alandır."
   ]
 }
