@@ -4,10 +4,6 @@ bir AI agent oluşturur. Agent, Gemini modelini kullanarak web sayfasının içe
 analiz eder ve ana noktaları, istatistikleri ve önemli bulguları JSON formatında çıkarır.
 Ayrıca, işlemin her adımının performansını ölçmek için kapsamlı benchmark (performans ölçümü)
 özellikleri içerir.
-
-Bu script, bir junior yazılımcının modern AI agent'larının nasıl çalıştığını anlaması için
-detaylı açıklamalar ve yorum satırları ile donatılmıştır.
-
 Ana İş Akışı:
 1.  **Kurulum ve Kontroller:** Gerekli ortam değişkenleri (API anahtarları) ve bağımlılıklar (npx) kontrol edilir.
 2.  **Argüman Ayrıştırma:** Kullanıcının komut satırından bir URL girmesi ve benchmark raporu isteyip istemediği alınır.
