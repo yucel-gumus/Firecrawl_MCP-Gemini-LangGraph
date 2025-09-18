@@ -1,0 +1,20 @@
+[
+  {
+    "timestamp": "2025-09-18T10:34:31.221639",
+    "url": "https://mertcobanov.medium.com/environment-variables-nedir-python-dotenv-kullan%C4%B1m%C4%B1-0c737a9731b1",
+    "durations": {
+      "llm_init_seconds": 0.026,
+      "tools_load_seconds": 0.688,
+      "agent_init_seconds": 0.005,
+      "scraping_seconds": 1.476,
+      "llm_processing_seconds": 25.726,
+      "total_seconds": 27.924
+    },
+    "content_stats": {
+      "scraped_content_length": 26375,
+      "summary_length": 1869
+    },
+    "success": true,
+    "error": null
+  }
+]

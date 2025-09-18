@@ -1,0 +1,22 @@
+{
+  "main_points": [
+    "Yazılımcılar API anahtarları, şifreler gibi hassas bilgileri güvenli bir şekilde yönetmelidir.",
+    "`python-dotenv` kütüphanesi, bu tür hassas verileri kaynak kodundan ayrı tutarak güvenli bir şekilde yönetmeyi sağlar.",
+    "Hassas bilgiler, `KEY=VALUE` formatında `.env` adlı düz metin dosyalarında saklanır.",
+    "Bu yöntem, kimlik bilgilerini doğrudan kodda saklamaktan daha güvenlidir ve sızıntıları önler.",
+    "`python-dotenv` kurulduktan sonra, `load_dotenv()` fonksiyonu ile `.env` dosyasındaki değişkenler yüklenir ve `os.getenv()` veya `os.environ[]` ile erişilir.",
+    "`.env` dosyaları, hassas verilerin yanlışlıkla bir depoya yüklenmesini önlemek için genellikle `.gitignore` dosyasına eklenmelidir."
+  ],
+  "statistics": [
+    "Makalenin okuma süresi: 2 dakika.",
+    "Makalenin yayınlanma tarihi: 30 Eylül 2024.",
+    "Makale ile ilgili etkileşim sayısı: 6.",
+    "Örnek bir `.gitignore` dosyasında `.env` dosyalarının dışlandığı satırlar: 100 ve 113."
+  ],
+  "key_findings": [
+    "`python-dotenv`, Python projelerinde hassas bilgilerin güvenli bir şekilde yönetilmesi için temel bir araçtır.",
+    "Kütüphane, kimlik bilgilerini kaynak kodundan ayırarak yanlışlıkla ifşa edilmesini engeller.",
+    "`.env` dosyalarının `.gitignore`'a dahil edilmesi, sürüm kontrol sistemlerinde güvenlik sağlamak için kritik öneme sahiptir.",
+    "Bu yaklaşım, geliştiricilerin hassas verilere kolayca erişmesini sağlarken aynı zamanda güvenlik standartlarını korur."
+  ]
+}
