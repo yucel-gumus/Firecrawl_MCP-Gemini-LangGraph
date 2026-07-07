@@ -1,104 +1,107 @@
-# Web İçeriği Analiz ve Özetleme Agent'ı
+# 🕷️ Web Analiz & Özetleme Ajanı (LangGraph & Firecrawl MCP Agent)
 
-**Firecrawl MCP + LangGraph + Gemini** ile herhangi bir URL'den metin kazıyan, yapılandırılmış özet (ana noktalar, istatistikler, bulgular) üreten ve performans metriklerini kaydeden AI agent.
+Bu proje; Model Context Protocol (MCP) kullanarak harici web kazıma (scraping) servislerine bağlanan, **LangGraph** tabanlı bir akıllı ReAct (Reasoning + Acting) döngüsüyle hedef web sayfalarının temiz metin içeriklerini çıkartıp analiz eden ve yapılandırılmış özetler (JSON) üreten **Python & FastAPI** tabanlı bir Agentic AI uygulamasıdır.
 
-**GitHub:** [yucel-gumus/Firecrawl_MCP-Gemini-LangGraph](https://github.com/yucel-gumus/Firecrawl_MCP-Gemini-LangGraph)
-
----
-
-## Ne yapar?
-
-1. **Firecrawl (MCP)** ile hedef sayfanın temiz metnini çıkarır
-2. **Gemini** (LangGraph ReAct agent) içeriği analiz eder
-3. Çıktıyı **JSON** olarak kaydeder (`web_summary.json`)
-4. İsteğe bağlı **benchmark** raporu (`benchmark_results.json`, ham metin `raw_scraped_content.txt`)
-
-Hem **CLI** (`main.py`) hem **web arayüzü** (`app.py` + FastAPI + Jinja2 templates) desteklenir.
+Uygulama, hem komut satırı (CLI) hem de kullanıcı dostu bir web arayüzü (FastAPI + Jinja2) üzerinden çalıştırılabilir.
 
 ---
 
-## Mimari
+## 🌟 Öne Çıkan Özellikler
+
+* 🤖 **LangGraph ReAct Ajan Mimarisi:** Karar ve eylem döngülerini (ReAct) yönetmek için LangGraph (`StateGraph`) kullanılmıştır. Ajan, hedeflenen URL'i analiz etmek için ne zaman ve nasıl arama yapması gerektiğine kendisi karar verir.
+* 🔌 **Model Context Protocol (MCP) Entegrasyonu:** `langchain-mcp-adapters` aracılığıyla, standartlaştırılmış MCP arayüzü üzerinden **npx Firecrawl MCP** sunucusuna bağlanır. Model, web kazıma işlemini yerel/harici bir araç çağrısı (Tool Calling) olarak yürütür.
+* 🕸️ **Firecrawl ile Temiz Metin Kazıma:** Hedef web sayfasının HTML kodları, reklamları ve CSS dosyaları elenerek temizlenmiş Markdown/düz metin formatında okunur.
+* 📊 **Zamanlı Benchmark Ölçümü:** Web kazıma ve yapay zeka modelinin (Gemini) yanıt sürelerini ölçüp karşılaştırarak `benchmark_results.json` dosyasına performans analizlerini kaydeder.
+* 💻 **Çift Arayüz Desteği:**
+  * **CLI:** `python main.py <url>` komutuyla hızlı analiz.
+  * **Web UI:** FastAPI ve Jinja2 şablonları (`app.py`) ile görsel sonuç paneli.
+
+---
+
+## 🏗️ Mimarî İş Akışı (LangGraph Graph)
 
 ```
-URL ──► Firecrawl MCP (npx) ──► ham metin
-                    │
-                    ▼
-         LangGraph create_react_agent
-                    │
-                    ▼
-              Gemini 1.5 Flash
-                    │
-                    ▼
-    JSON özet + benchmark zamanları
+[ Arama Talebi (URL) ] 
+          │
+          ▼
+[ LangGraph StateGraph (Start) ]
+          │
+          ▼
+[ Agent Decision Node ] ──► (Gerektiğinde Firecrawl MCP Aracını Tetikler)
+          │
+          ▼
+[ Tool Node (Firecrawl) ] ──► (Ham HTML -> Temiz Markdown Metni Dönüştürür)
+          │
+          ▼
+[ Agent Analysis Node ] ──► (İçeriği Okur, Ana Bulguları & İstatistikleri Çıkarır)
+          │
+          ▼
+[ JSON Output Generation ] ──► (Özeti `web_summary.json` Olarak Yazar)
 ```
 
 ---
 
-## Gereksinimler
+## 🛠️ Teknoloji Stack
 
-- Python 3.8+
-- **Node.js + npx** (Firecrawl MCP sunucusu için)
-- `GOOGLE_API_KEY` veya `GEMINI_API_KEY` (`.env`)
-- `FIRECRAWL_API_KEY` (Firecrawl kullanımı için)
+* **Ajan & LLM Framework:** LangGraph, LangChain, `langchain-google-genai`.
+* **Protokol:** MCP (Model Context Protocol) via `mcp` & `langchain-mcp-adapters`.
+* **Web Framework:** FastAPI, Uvicorn, Jinja2 Templates.
+* **Veri Yönetimi:** Pydantic (veri şeması doğrulama), `orjson`.
 
+---
+
+## 📂 Proje Klasör Yapısı
+
+```
+Firecrawl_MCP-Gemini-LangGraph/
+├── templates/
+│   └── index.html            # FastAPI web arayüzü Jinja2 şablonu
+├── app.py                    # Web sunucu arayüzü (FastAPI)
+├── main.py                   # Ajan mantığının kurulduğu ve CLI giriş noktası
+├── requirements.txt          # LangGraph, LangChain ve MCP bağımlılıkları
+├── web_summary.json          # En son üretilen yapılandırılmış JSON özeti
+└── benchmark_results.json    # Kazıma ve analiz işlem süreleri performans raporu
+```
+
+---
+
+## 🚀 Kurulum ve Yerel Çalıştırma
+
+### 1. Bağımlılıkları Yükleyin
 ```bash
+git clone https://github.com/yucel-gumus/Firecrawl_MCP-Gemini-LangGraph.git
+cd Firecrawl_MCP-Gemini-LangGraph
 pip install -r requirements.txt
 ```
 
----
+### 2. Ortam Değişkenleri (`.env`)
+Kök dizinde `.env` dosyası oluşturun ve anahtarlarınızı girin:
 
-## Komut satırı
+```env
+# Google Gemini API Anahtarı
+GOOGLE_API_KEY=your_gemini_api_key
 
-```bash
-python main.py "https://example.com/article"
-python main.py "https://example.com" --benchmark
+# Firecrawl API Anahtarı
+FIRECRAWL_API_KEY=your_firecrawl_api_key
 ```
 
----
+### 3. Komut Satırı Üzerinden Çalıştırma (CLI)
+```bash
+# Sadece analiz yapma
+python main.py "https://example.com/article"
 
-## Web arayüzü
+# Performans sürelerini ölçerek benchmark modunda çalıştırma
+python main.py "https://example.com/article" --benchmark
+```
 
+### 4. Web Arayüzünü Başlatma
 ```bash
 uvicorn app:app --reload
-# http://127.0.0.1:8000 — formdan URL girin
 ```
-
-`app.py` aynı agent mantığını HTTP POST ile çalıştırır; sonuçları template üzerinde gösterir.
-
----
-
-## Çıktı dosyaları
-
-| Dosya | İçerik |
-|-------|--------|
-| `raw_scraped_content.txt` | Kazınan ham metin |
-| `web_summary.json` | LLM yapılandırılmış özeti |
-| `benchmark_results.json` | Scraping / LLM süreleri |
+Uygulama `http://127.0.0.1:8000` adresinde başlayacaktır.
 
 ---
 
-## Teknolojiler
-
-| Bileşen | Kütüphane |
-|---------|-----------|
-| Agent | LangGraph, LangChain |
-| LLM | `langchain_google_genai` |
-| MCP | `langchain_mcp_adapters` |
-| Web | FastAPI, Jinja2 |
-| Scraping | Firecrawl via MCP |
-
----
-
-## Sorun giderme
-
-| Hata | Çözüm |
-|------|--------|
-| `npx` bulunamadı | Node.js LTS kurun |
-| MCP bağlantı hatası | Firecrawl API key ve ağ erişimi |
-| Gemini 429 | Rate limit — tekrar deneyin veya model kotası |
-
----
-
-## Lisans
-
-MIT veya repo ile belirtilen lisans.
+## 🔗 Bağlantılar
+* **GitHub Repository:** [https://github.com/yucel-gumus/Firecrawl_MCP-Gemini-LangGraph](https://github.com/yucel-gumus/Firecrawl_MCP-Gemini-LangGraph)
+* **Geliştirici LinkedIn:** [https://linkedin.com/in/yucel-gumus](https://linkedin.com/in/yucel-gumus)
