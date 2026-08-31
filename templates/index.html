@@ -678,7 +678,7 @@
         footer a:hover { color: #ffffff; }
 
         /* ==========================================================================
-           EXECUTIVE A4 PRINT/PDF DOCUMENT (CLEAN VECTOR LAYOUT)
+           EXECUTIVE A4 PRINT/PDF DOCUMENT (CLEAN VECTOR LAYOUT - NO OVERFLOW)
            ========================================================================== */
         #pdf-render-wrapper {
             display: none;
@@ -687,101 +687,122 @@
         .pdf-memo-container {
             background: #ffffff;
             color: #0f172a;
-            padding: 45px 50px;
+            padding: 24px 28px;
             font-family: var(--font-sans);
-            width: 820px;
+            width: 680px;
+            max-width: 680px;
             margin: 0 auto;
-            line-height: 1.6;
+            line-height: 1.5;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .pdf-memo-header {
             border-bottom: 2px solid #0f172a;
-            padding-bottom: 14px;
-            margin-bottom: 18px;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
         }
 
         .pdf-memo-title {
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 800;
             color: #0f172a;
             letter-spacing: -0.02em;
         }
 
         .pdf-memo-sub {
-            font-size: 10px;
+            font-size: 9.5px;
             color: #64748b;
             margin-top: 2px;
         }
 
         .pdf-meta-box-clean {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
-            font-size: 10px;
-            margin-bottom: 18px;
+            font-size: 9.5px;
+            margin-bottom: 14px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
+            box-sizing: border-box;
         }
 
         .pdf-meta-box-clean td {
-            padding: 6px 10px;
+            padding: 5px 8px;
             border: 1px solid #e2e8f0;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .pdf-heading-block {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: #0f172a;
             border-bottom: 1px solid #cbd5e1;
-            padding-bottom: 4px;
-            margin-top: 18px;
-            margin-bottom: 10px;
+            padding-bottom: 3px;
+            margin-top: 14px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
         }
 
         .pdf-exec-paragraph {
-            font-size: 11px;
-            line-height: 1.7;
+            font-size: 10px;
+            line-height: 1.6;
             color: #1e293b;
-            margin-bottom: 14px;
-            text-align: justify;
+            margin-bottom: 12px;
+            text-align: left;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .pdf-topic-card-print {
             border: 1px solid #e2e8f0;
             background: #f8fafc;
             border-radius: 4px;
-            padding: 8px 12px;
+            padding: 8px 10px;
             margin-bottom: 8px;
+            box-sizing: border-box;
+            page-break-inside: avoid;
         }
 
         .pdf-topic-name-print {
-            font-size: 11.5px;
+            font-size: 10.5px;
             font-weight: 700;
             color: #0f172a;
             margin-bottom: 2px;
+            word-break: break-word;
         }
 
         .pdf-topic-desc-print {
-            font-size: 10px;
+            font-size: 9.5px;
             color: #475569;
             margin-bottom: 4px;
+            line-height: 1.5;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .pdf-topic-bullets-print {
             list-style: none;
             padding-left: 0;
-            font-size: 10px;
+            font-size: 9px;
             color: #334155;
+            line-height: 1.45;
         }
 
         .pdf-topic-bullets-print li {
-            padding-left: 12px;
+            padding-left: 10px;
             position: relative;
             margin-bottom: 2px;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .pdf-topic-bullets-print li::before {
@@ -793,37 +814,47 @@
 
         .pdf-table-print {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
-            font-size: 10px;
-            margin-bottom: 14px;
+            font-size: 9px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+            page-break-inside: avoid;
         }
 
         .pdf-table-print th {
             background: #f1f5f9;
             color: #0f172a;
             font-weight: 700;
-            padding: 6px 8px;
+            padding: 5px 7px;
             border: 1px solid #cbd5e1;
             text-align: left;
         }
 
         .pdf-table-print td {
-            padding: 6px 8px;
+            padding: 5px 7px;
             border: 1px solid #e2e8f0;
             color: #334155;
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            vertical-align: top;
         }
 
         .pdf-list-print {
             list-style: none;
             padding-left: 0;
-            font-size: 10px;
+            font-size: 9.5px;
+            line-height: 1.5;
         }
 
         .pdf-list-print li {
-            padding-left: 14px;
+            padding-left: 12px;
             position: relative;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             color: #334155;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .pdf-list-print li::before {
@@ -834,12 +865,12 @@
         }
 
         .pdf-footer-clean {
-            margin-top: 25px;
+            margin-top: 20px;
             border-top: 1px solid #e2e8f0;
-            padding-top: 8px;
+            padding-top: 6px;
             display: flex;
             justify-content: space-between;
-            font-size: 9px;
+            font-size: 8.5px;
             color: #94a3b8;
         }
     </style>
@@ -1257,11 +1288,19 @@
 
             const element = document.getElementById('pdf-document');
             const opt = {
-                margin: [10, 10, 10, 10],
+                margin: [8, 8, 8, 8],
                 filename: fileName,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    letterRendering: true,
+                    scrollX: 0,
+                    scrollY: 0,
+                    windowWidth: 700
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
