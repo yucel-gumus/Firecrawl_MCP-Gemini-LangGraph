@@ -33,11 +33,6 @@ def parse_arguments():
         default="gemini-3.7-flash",
         help="Kullanılacak Gemini modeli (Varsayılan: gemini-3.7-flash)"
     )
-    parser.add_argument(
-        "--no-save",
-        action="store_true",
-        help="Çıktıları dosyalara (txt/json) kaydetmeyi devre dışı bırakır."
-    )
     return parser.parse_args()
 
 
@@ -147,14 +142,11 @@ async def main():
 
     result = await run_pipeline(
         url=args.url,
-        save_files=not args.no_save,
         model_name=args.model
     )
 
     if result.get("success"):
         print_summary_report(result)
-        if not args.no_save:
-            print("\n💾 Çıktılar 'web_summary.json' ve 'raw_scraped_content.txt' dosyalarına kaydedildi.")
     else:
         print(f"\n❌ İşlem başarısız: {result.get('error')}")
 

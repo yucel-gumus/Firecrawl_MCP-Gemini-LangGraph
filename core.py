@@ -329,53 +329,14 @@ async def run_pipeline(
         benchmark_data["error"] = final_state.get("error")
         benchmark_data["summary"] = final_state.get("summary")
 
-        if save_files:
-            raw_content = final_state.get("raw_content", "")
-            if raw_content:
-                with open("raw_scraped_content.txt", "w", encoding="utf-8") as f:
-                    f.write(raw_content)
-
-            if benchmark_data["summary"]:
-                with open("web_summary.json", "w", encoding="utf-8") as f:
-                    json.dump(benchmark_data["summary"], f, ensure_ascii=False, indent=2)
-
     except asyncio.TimeoutError:
         benchmark_data["error"] = "Pipeline zaman aşımına uğradı (Timeout)."
         benchmark_data["success"] = False
     except Exception as e:
         benchmark_data["error"] = f"Pipeline çalışma hatası: {type(e).__name__} - {str(e)}"
         benchmark_data["success"] = False
-
     finally:
         total_end_time = time.time()
         benchmark_data["durations"]["total_seconds"] = round(total_end_time - total_start_time, 3)
-
-        if save_files:
-            try:
-                benchmark_file = "benchmark_results.json"
-                existing_data = []
-                if os.path.exists(benchmark_file):
-                    with open(benchmark_file, "r", encoding="utf-8") as f:
-                        try:
-                            existing_data = json.load(f)
-                            if not isinstance(existing_data, list):
-                                existing_data = [existing_data]
-                        except Exception:
-                            existing_data = []
-
-                log_entry = {
-                    "timestamp": benchmark_data["timestamp"],
-                    "url": benchmark_data["url"],
-                    "durations": benchmark_data["durations"],
-                    "content_stats": benchmark_data["content_stats"],
-                    "success": benchmark_data["success"],
-                    "error": benchmark_data["error"],
-                }
-                existing_data.append(log_entry)
-
-                with open(benchmark_file, "w", encoding="utf-8") as f:
-                    json.dump(existing_data, f, ensure_ascii=False, indent=2)
-            except Exception as e:
-                print(f"Benchmark verisi kaydedilirken hata: {e}", file=sys.stderr)
 
     return benchmark_data

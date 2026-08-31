@@ -30,7 +30,6 @@ templates = Jinja2Templates(directory="templates")
 class SummarizeRequest(BaseModel):
     url: str = Field(..., description="Kazınacak ve özetlenecek tam web sayfası URL'si")
     model: Optional[str] = Field(default="gemini-3.7-flash", description="Kullanılacak Gemini modeli")
-    save_files: Optional[bool] = Field(default=True, description="Sonuçların diske yazılıp yazılmayacağı")
 
 
 # --- Endpointler ---
@@ -54,7 +53,6 @@ async def summarize_endpoint(req: SummarizeRequest):
     try:
         result = await run_pipeline(
             url=url_str,
-            save_files=req.save_files if req.save_files is not None else True,
             model_name=req.model or "gemini-3.7-flash"
         )
         return JSONResponse(content=result)
