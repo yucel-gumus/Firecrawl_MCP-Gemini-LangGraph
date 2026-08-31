@@ -678,200 +678,274 @@
         footer a:hover { color: #ffffff; }
 
         /* ==========================================================================
-           EXECUTIVE A4 PRINT/PDF DOCUMENT (CLEAN VECTOR LAYOUT - NO OVERFLOW)
+           EXECUTIVE A4 PRINT/PDF DOCUMENT (FULL A4 WIDTH - 794px CANVAS)
            ========================================================================== */
         #pdf-render-wrapper {
-            display: none;
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 794px;
+            background: #ffffff;
+            opacity: 1;
+            z-index: -9999;
+            pointer-events: none;
         }
 
         .pdf-memo-container {
             background: #ffffff;
             color: #0f172a;
-            padding: 24px 28px;
+            padding: 36px 42px;
             font-family: var(--font-sans);
-            width: 680px;
-            max-width: 680px;
-            margin: 0 auto;
-            line-height: 1.5;
+            width: 794px;
             box-sizing: border-box;
+            line-height: 1.55;
             word-wrap: break-word;
             overflow-wrap: break-word;
-            word-break: break-word;
+            word-break: normal;
+        }
+
+        .pdf-memo-accent-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb 0%, #4f46e5 100%);
+            border-radius: 2px;
+            margin-bottom: 16px;
         }
 
         .pdf-memo-header {
-            border-bottom: 2px solid #0f172a;
-            padding-bottom: 10px;
-            margin-bottom: 14px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: flex-start;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .pdf-memo-title {
-            font-size: 17px;
+            font-size: 19px;
             font-weight: 800;
             color: #0f172a;
             letter-spacing: -0.02em;
         }
 
         .pdf-memo-sub {
+            font-size: 10.5px;
+            color: #475569;
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        .pdf-meta-col {
+            text-align: right;
+            font-size: 10px;
+            color: #475569;
+        }
+
+        .pdf-report-pill {
+            display: inline-block;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-weight: 700;
             font-size: 9.5px;
-            color: #64748b;
-            margin-top: 2px;
+            margin-bottom: 3px;
         }
 
         .pdf-meta-box-clean {
             width: 100%;
             table-layout: fixed;
             border-collapse: collapse;
-            font-size: 9.5px;
-            margin-bottom: 14px;
+            font-size: 10px;
+            margin-bottom: 16px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
+            border-radius: 6px;
             box-sizing: border-box;
         }
 
         .pdf-meta-box-clean td {
-            padding: 5px 8px;
+            padding: 7px 10px;
             border: 1px solid #e2e8f0;
             word-break: break-word;
-            overflow-wrap: break-word;
         }
 
         .pdf-heading-block {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #0f172a;
-            border-bottom: 1px solid #cbd5e1;
-            padding-bottom: 3px;
-            margin-top: 14px;
-            margin-bottom: 8px;
+            letter-spacing: 0.04em;
+            color: #1e3a8a;
+            border-bottom: 1.5px solid #2563eb;
+            padding-bottom: 4px;
+            margin-top: 18px;
+            margin-bottom: 10px;
             page-break-after: avoid;
         }
 
         .pdf-exec-paragraph {
-            font-size: 10px;
-            line-height: 1.6;
+            background: #f8fafc;
+            border-left: 4px solid #2563eb;
+            padding: 12px 16px;
+            border-radius: 0 6px 6px 0;
+            font-size: 11px;
+            line-height: 1.7;
             color: #1e293b;
-            margin-bottom: 12px;
-            text-align: left;
+            margin-bottom: 16px;
+            text-align: justify;
             word-break: break-word;
-            overflow-wrap: break-word;
         }
 
         .pdf-topic-card-print {
             border: 1px solid #e2e8f0;
-            background: #f8fafc;
-            border-radius: 4px;
-            padding: 8px 10px;
-            margin-bottom: 8px;
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
             box-sizing: border-box;
             page-break-inside: avoid;
         }
 
         .pdf-topic-name-print {
-            font-size: 10.5px;
+            font-size: 11.5px;
             font-weight: 700;
             color: #0f172a;
-            margin-bottom: 2px;
-            word-break: break-word;
+            margin-bottom: 3px;
         }
 
         .pdf-topic-desc-print {
-            font-size: 9.5px;
+            font-size: 10.5px;
             color: #475569;
-            margin-bottom: 4px;
-            line-height: 1.5;
-            word-break: break-word;
-            overflow-wrap: break-word;
+            margin-bottom: 6px;
+            line-height: 1.55;
         }
 
         .pdf-topic-bullets-print {
             list-style: none;
             padding-left: 0;
-            font-size: 9px;
+            font-size: 10px;
             color: #334155;
-            line-height: 1.45;
+            line-height: 1.5;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 5px;
         }
 
         .pdf-topic-bullets-print li {
-            padding-left: 10px;
+            padding-left: 12px;
             position: relative;
-            margin-bottom: 2px;
-            word-break: break-word;
-            overflow-wrap: break-word;
+            margin-bottom: 3px;
         }
 
         .pdf-topic-bullets-print li::before {
             content: "•";
             position: absolute;
             left: 0;
-            color: #4f46e5;
+            color: #2563eb;
+            font-weight: 800;
         }
 
         .pdf-table-print {
             width: 100%;
             table-layout: fixed;
             border-collapse: collapse;
-            font-size: 9px;
-            margin-bottom: 12px;
+            font-size: 10px;
+            margin-bottom: 14px;
             box-sizing: border-box;
             page-break-inside: avoid;
         }
 
         .pdf-table-print th {
-            background: #f1f5f9;
-            color: #0f172a;
+            background: #1e293b;
+            color: #ffffff;
             font-weight: 700;
-            padding: 5px 7px;
-            border: 1px solid #cbd5e1;
+            padding: 7px 10px;
+            border: 1px solid #334155;
             text-align: left;
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
         .pdf-table-print td {
-            padding: 5px 7px;
+            padding: 8px 10px;
             border: 1px solid #e2e8f0;
             color: #334155;
-            line-height: 1.4;
+            line-height: 1.45;
             word-break: break-word;
-            overflow-wrap: break-word;
             vertical-align: top;
+        }
+
+        .pdf-table-print tr:nth-child(even) td {
+            background: #f8fafc;
         }
 
         .pdf-list-print {
             list-style: none;
             padding-left: 0;
-            font-size: 9.5px;
-            line-height: 1.5;
+            font-size: 10.5px;
+            line-height: 1.55;
         }
 
         .pdf-list-print li {
-            padding-left: 12px;
+            padding: 7px 10px 7px 24px;
             position: relative;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
             color: #334155;
             word-break: break-word;
-            overflow-wrap: break-word;
         }
 
-        .pdf-list-print li::before {
-            content: "—";
+        .pdf-list-print.findings-print li {
+            border-left: 3px solid #10b981;
+        }
+
+        .pdf-list-print.findings-print li::before {
+            content: "✓";
             position: absolute;
-            left: 0;
-            color: #64748b;
+            left: 8px;
+            color: #059669;
+            font-weight: 800;
+        }
+
+        .pdf-list-print.actions-print li {
+            border-left: 3px solid #4f46e5;
+        }
+
+        .pdf-list-print.actions-print li::before {
+            content: "→";
+            position: absolute;
+            left: 8px;
+            color: #4f46e5;
+            font-weight: 800;
+        }
+
+        .pdf-entities-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .pdf-entity-pill {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 9.5px;
+            font-weight: 600;
         }
 
         .pdf-footer-clean {
-            margin-top: 20px;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 6px;
+            margin-top: 24px;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 8px;
             display: flex;
             justify-content: space-between;
-            font-size: 8.5px;
-            color: #94a3b8;
+            font-size: 9px;
+            color: #64748b;
         }
     </style>
 </head>
@@ -1088,16 +1162,18 @@
     <!-- Toast Notification -->
     <div id="app-toast" class="app-toast-alert">Bildirim</div>
 
-    <!-- Hidden Dedicated Printable PDF Document (A4 Clean Layout) -->
+    <!-- Dedicated Printable PDF Document (A4 Clean Layout) -->
     <div id="pdf-render-wrapper">
         <div id="pdf-document" class="pdf-memo-container">
+            <div class="pdf-memo-accent-bar"></div>
+            
             <div class="pdf-memo-header">
                 <div>
-                    <div class="pdf-memo-title">WEB İÇERİK ANALİZ RAPORU</div>
+                    <div class="pdf-memo-title">WEB İÇERİK ANALİZ VE İSTİHBARAT RAPORU</div>
                     <div class="pdf-memo-sub">Motor: Firecrawl MCP • Analiz Modeli: Google Gemini 3.7 Flash</div>
                 </div>
-                <div style="text-align: right; font-size: 9.5px; color: #64748b;">
-                    <div>Rapor No: <strong id="pdf-report-id">001</strong></div>
+                <div class="pdf-meta-col">
+                    <div class="pdf-report-pill">RAPOR NO: <span id="pdf-report-id">001</span></div>
                     <div>Tarih: <strong id="pdf-date">--</strong></div>
                 </div>
             </div>
@@ -1123,19 +1199,22 @@
             <table class="pdf-table-print">
                 <thead>
                     <tr>
-                        <th style="width: 28%;">Metrik</th>
+                        <th style="width: 28%;">Metrik / Konu</th>
                         <th style="width: 22%;">Değer</th>
-                        <th style="width: 50%;">Bağlam</th>
+                        <th style="width: 50%;">Bağlam / Açıklama</th>
                     </tr>
                 </thead>
                 <tbody id="pdf-stats-tbody"></tbody>
             </table>
 
             <div class="pdf-heading-block">4. Stratejik Bulgular ve Çıkarımlar</div>
-            <ul class="pdf-list-print" id="pdf-findings-list"></ul>
+            <ul class="pdf-list-print findings-print" id="pdf-findings-list"></ul>
 
             <div class="pdf-heading-block">5. Uygulanabilir Eylem Maddeleri</div>
-            <ul class="pdf-list-print" id="pdf-takeaways-list"></ul>
+            <ul class="pdf-list-print actions-print" id="pdf-takeaways-list"></ul>
+
+            <div class="pdf-heading-block">6. Tespit Edilen Şirketler, Modeller ve Teknolojiler</div>
+            <div class="pdf-entities-grid" id="pdf-entities-container"></div>
 
             <div class="pdf-footer-clean">
                 <span>Web İçerik Analizi • Firecrawl MCP & Gemini LangGraph Agent</span>
@@ -1280,6 +1359,21 @@
                 pdfTakeaways.appendChild(li);
             });
 
+            // Entities
+            const pdfEntities = document.getElementById('pdf-entities-container');
+            if (pdfEntities) {
+                pdfEntities.innerHTML = '';
+                (currentResultData.entities_and_technologies || []).forEach(e => {
+                    const pill = document.createElement('span');
+                    pill.className = 'pdf-entity-pill';
+                    pill.textContent = e;
+                    pdfEntities.appendChild(pill);
+                });
+                if (!currentResultData.entities_and_technologies || currentResultData.entities_and_technologies.length === 0) {
+                    pdfEntities.innerHTML = '<span style="font-size: 9.5px; color: #94a3b8;">Belirli bir varlık listelenmedi.</span>';
+                }
+            }
+
             let domain = 'analiz_raporu';
             try {
                 domain = new URL(currentUrl).hostname.replace('www.', '');
@@ -1297,7 +1391,8 @@
                     letterRendering: true,
                     scrollX: 0,
                     scrollY: 0,
-                    windowWidth: 700
+                    width: 794,
+                    windowWidth: 794
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
