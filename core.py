@@ -22,6 +22,7 @@ from google import genai
 from google.genai import types
 from firecrawl import FirecrawlApp
 from langgraph.graph import StateGraph, START, END
+from config import DEFAULT_MODEL, FALLBACK_MODELS, LLM_TIMEOUT_MS, PIPELINE_TIMEOUT_S
 
 # Ortam değişkenlerini yükle
 load_dotenv()
@@ -119,7 +120,7 @@ async def scrape_url_with_sdk(url: str) -> str:
 def extract_structured_summary(
     content: str,
     url: str,
-    preferred_model: str = "gemini-3.7-flash"
+    preferred_model: str = DEFAULT_MODEL
 ) -> WebSummary:
     """
     Google Gemini Chat API ile derinlemesine ve kapsamlı analiz yapar.
@@ -128,7 +129,7 @@ def extract_structured_summary(
     api_key = os.getenv("GEMINI_API_KEY")
     client = genai.Client(
         api_key=api_key,
-        http_options=types.HttpOptions(timeout=120000)  # 120 saniye
+        http_options=types.HttpOptions(timeout=LLM_TIMEOUT_MS)
     )
 
     prompt = f"""
@@ -152,10 +153,9 @@ GÖREV TALİMATLARI:
 Lütfen yüzeysel veya kısa maddeler yerine, okuyucuya tam kapsamlı istihbarat sunacak zenginlikte yanıt ver.
 """
 
-    # Geçerli ve aktif Gemini model isimleri
-    fallback_models = ["gemini-3.7-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite"]
+    # Model isimleri config.py'den gelir — bu dosyada model adı YAZILMAZ
     models_to_try = [preferred_model] if preferred_model else []
-    for m in fallback_models:
+    for m in FALLBACK_MODELS:
         if m not in models_to_try:
             models_to_try.append(m)
 
@@ -225,7 +225,7 @@ def create_summarizer_graph():
 
         durations = state.get("durations", {})
         content_stats = state.get("content_stats", {})
-        preferred_model = state.get("preferred_model", "gemini-3.7-flash")
+        preferred_model = state.get("preferred_model", DEFAULT_MODEL)
 
         llm_start = time.time()
         try:
@@ -268,7 +268,7 @@ def create_summarizer_graph():
 async def run_pipeline(
     url: str,
     save_files: bool = True,
-    model_name: str = "gemini-3.7-flash"
+    model_name: str = DEFAULT_MODEL
 ) -> Dict[str, Any]:
     """Tam analiz iş akışını çalıştırır."""
     validate_environment()
@@ -299,7 +299,7 @@ async def run_pipeline(
 
         final_state = await asyncio.wait_for(
             graph.ainvoke(initial_state),
-            timeout=120.0
+            timeout=PIPELINE_TIMEOUT_S
         )
 
         benchmark_data["durations"] = final_state.get("durations", benchmark_data["durations"])

@@ -13,6 +13,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
 from core import run_pipeline, validate_environment
+from config import DEFAULT_MODEL
 
 # FastAPI uygulamasını başlat
 app = FastAPI(
@@ -29,7 +30,7 @@ templates = Jinja2Templates(directory="templates")
 
 class SummarizeRequest(BaseModel):
     url: str = Field(..., description="Kazınacak ve özetlenecek tam web sayfası URL'si")
-    model: Optional[str] = Field(default="gemini-3.7-flash", description="Kullanılacak Gemini modeli")
+    model: Optional[str] = Field(default=None, description="Kullanılacak Gemini modeli (boş bırakılırsa config.py'deki DEFAULT_MODEL kullanılır)")
 
 
 # --- Endpointler ---
@@ -53,7 +54,7 @@ async def summarize_endpoint(req: SummarizeRequest):
     try:
         result = await run_pipeline(
             url=url_str,
-            model_name=req.model or "gemini-3.7-flash"
+            model_name=req.model or DEFAULT_MODEL
         )
         return JSONResponse(content=result)
     except Exception as e:

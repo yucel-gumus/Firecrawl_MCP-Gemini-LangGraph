@@ -7,7 +7,8 @@ import sys
 import asyncio
 import argparse
 import json
-from core import run_pipeline, validate_environment, check_npx_available
+from core import run_pipeline, validate_environment
+from config import DEFAULT_MODEL
 
 
 def parse_arguments():
@@ -30,8 +31,8 @@ def parse_arguments():
         "--model",
         "-m",
         type=str,
-        default="gemini-3.7-flash",
-        help="Kullanılacak Gemini modeli (Varsayılan: gemini-3.7-flash)"
+        default=DEFAULT_MODEL,
+        help=f"Kullanılacak Gemini modeli (Varsayılan: {DEFAULT_MODEL})"
     )
     return parser.parse_args()
 
