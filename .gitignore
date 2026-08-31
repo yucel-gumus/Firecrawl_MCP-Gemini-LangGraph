@@ -1,2 +1,11 @@
 .env
+.env.*
+!.env.example
 venv
+.venv
+__pycache__/
+*.pyc
+.DS_Store
+raw_scraped_content.txt
+web_summary.json
+benchmark_results.json

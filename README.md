@@ -1,113 +1,153 @@
-# 🕷️ Firecrawl MCP & LangGraph AI Web Scraper & Summarizer
+# 🕷️ Firecrawl MCP + Gemini 3.7 Flash + LangGraph Web Intelligence Agent
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![LangGraph](https://img.shields.io/badge/LangGraph-Agentic_Workflow-FF9900?style=for-the-badge)](https://langchain-ai.github.io/langgraph/)
-[![Firecrawl](https://img.shields.io/badge/Firecrawl-MCP_Scraper-FF4F00?style=for-the-badge)](https://firecrawl.dev/)
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-Structured_Summary-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
-[![Portfolio](https://img.shields.io/badge/Portfolio-yucelgumus.dev-2563EB?style=for-the-badge&logo=google-chrome&logoColor=white)](https://www.yucelgumus.dev/)
+**Firecrawl MCP**, **Google Gemini 3.7 Flash** ve **LangGraph StateGraph** mimarisini bir araya getiren yeni nesil yapay zeka destekli web istihbarat, içerik kazıma ve derinlemesine analiz platformu.
 
-> **Model Context Protocol (MCP)** ve **Firecrawl** entegrasyonu ile web sayfalarını temiz Markdown formatında kazıyan, **LangGraph** tabanlı akıllı ajan döngüsüyle içeriği analiz edip yapılandırılmış JSON özetleri ve anahtar çıkarımlar üreten Agentic AI platformu.
+Bu proje; web sayfalarını karmaşık HTML/DOM etiketlerinden ve reklam gürültüsünden arındırarak saf Markdown formatında çeker, ardından **LangGraph** durumu üzerinde **Google Gemini 3.7 Flash** ile yapılandırılmış kurumsal analiz raporlarına (Yönetici Özeti, Tematik Konular, İstatistik Tablosu, Stratejik Bulgular, Eylem Planı, Tespit Edilen Şirket/Teknoloji Matrisi) dönüştürür.
 
 ---
 
-## 🌟 Öne Çıkan Özellikler
+## 🌟 Temel Özellikler
 
-- 🕸️ **Firecrawl MCP Entegrasyonu:** JavaScript ile dinamik yüklenen modern web sitelerini dahi DOM gürültüsünden arındırarak saf Markdown ve metin olarak kazıma.
-- 🔄 **LangGraph Döngüsel Ajan Mimarisi:** Kazıma (Scrape) ➔ Temizleme (Clean) ➔ Analiz (Analyze) ➔ Yapılandırılmış Çıkarım (Structured Extraction) aşamalarından oluşan otonom iş akışı.
-- 📊 **Yapılandırılmış JSON & Rapor Üretimi:** Web sayfasının ana fikrini, temel istatistiklerini, hedef kitlesini ve eylem maddelerini standart JSON formatında dışa aktarma (`web_summary.json`).
-- 🖥️ **Çift Kullanım Modu (CLI & Web UI):** İster terminal üzerinden hızlı komut satırı aracı (`main.py`), ister FastAPI & Jinja2 tabanlı modern web arayüzü (`app.py`).
-- ⚡ **Benchmark & Performans İzleme:** Kazıma sürelerini ve token verimliliğini ölçen yerleşik kıyaslama sistemi (`benchmark_results.json`).
+- **⚡ Tek Adımlı Akıllı Kazıma (Single-Pass Scraping):** Firecrawl MCP stdio protokolü ile entegre edilerek çift istek (double scraping) maliyeti ve gecikmesi ortadan kaldırılmıştır.
+- **🧠 Google Gemini 3.7 Flash & Akıllı Yedekleme (Fallback):** Birincil model olarak en güncel `gemini-3.7-flash` kullanılır. 10 saniyelik deadline süresiyle olası 503/gecikme durumlarında sistem duraksamadan anında optimize edilmiş yedek modellere (`gemini-flash-lite-latest` / `gemini-3.5-flash-lite`) geçer.
+- **🔄 LangGraph StateGraph Pipeline:** `scrape_node` ve `summarize_node` düğümleri arasında Pydantic şeması ile tip güvenli ve izlenebilir durum yönetimi.
+- **📊 Kapsamlı İstihbarat Şeması:**
+  - **Yönetici Özeti (Executive Summary):** 2-3 paragraflık derinlemesine genel bakış.
+  - **Detaylı Konu Kırılımları:** Sayfadaki her ana temanın detaylı açıklaması ve alt maddeleri.
+  - **Doğrulanmış İstatistik ve Veri Tablosu:** Metrik, Sayısal Değer ve Bağlam sütunları.
+  - **Stratejik Bulgular ve Aksiyon Planı:** Somut çıkarımlar ve uygulanabilir öneriler.
+  - **Varlık & Teknoloji Matrisi:** Bahsedilen modeller, kurumlar, protokoller ve kişiler.
+- **🗂️ Sekmeli Çalışma Alanı (Tabbed Workspace Web UI):** FastAPI & Jinja2 tabanlı, gereksiz süslemelerden arındırılmış, modern ve odaklı araştırma arayüzü.
+- **📄 Vektörel Kurumsal PDF Raporu:** `html2pdf.js` ile tek tıkla resmi, antetli ve temiz A4 formatında PDF rapor indirme imkânı.
+- **💻 CLI & Benchmark Desteği:** Komut satırından `--benchmark` bayrağı ile anlık süre dağılımı (MCP, Kazıma, LLM süresi) ve içerik boyutu metrikleri.
 
 ---
 
-## 🏗️ Mimari & LangGraph Ajan Akışı
+## 🏗️ Mimari Şema
 
-```mermaid
-graph TD
-    InputURL[Hedef URL Girdisi] --> FirecrawlMCP[Firecrawl MCP Client]
-    FirecrawlMCP -->|Ham / Temiz Markdown| StateGraph[LangGraph State Workflow]
-    StateGraph --> NodeParse[1. İçerik ve Başlık Analizi]
-    NodeParse --> NodeSummarize[2. Gemini 1.5 Özümseme]
-    NodeSummarize --> NodeExtract[3. JSON Şema Çıkarımı]
-    NodeExtract --> OutputJSON[(web_summary.json)]
-    NodeExtract --> WebUI[Web Arayüzü & CLI Görüntüleyici]
+```
+                           ┌────────────────────────┐
+                           │      Hedef Web URL     │
+                           └───────────┬────────────┘
+                                       │
+                                       ▼
+                     ┌────────────────────────────────────┐
+                     │         LangGraph StateGraph       │
+                     └─────────────────┬──────────────────┘
+                                       │
+                ┌──────────────────────┴──────────────────────┐
+                ▼                                             ▼
+     ┌─────────────────────┐                       ┌─────────────────────┐
+     │     Scrape Node     │                       │   Summarize Node    │
+     │  (Firecrawl MCP)    │                       │  (Gemini 3.7 Flash) │
+     │  Saf Markdown Çekimi│ ────── State ───────► │  Yapılandırılmış    │
+     │  & JSON Temizleme   │                       │  Pydantic Çıkarımı  │
+     └─────────────────────┘                       └──────────┬──────────┘
+                                                              │
+                                       ┌──────────────────────┴──────────────────────┐
+                                       ▼                                             ▼
+                            ┌─────────────────────┐                       ┌─────────────────────┐
+                            │   Modern Web UI     │                       │    CLI & Benchmark  │
+                            │  Sekmeli Çalışma    │                       │   (main.py terminal │
+                            │  Alanı & A4 PDF     │                       │    raporlama)       │
+                            └─────────────────────┘                       └─────────────────────┘
 ```
 
 ---
 
-## 🚀 Hızlı Başlangıç
+## 🔑 Gereksinimler & API Anahtarları
 
-### Gereksinimler
-- **Python**: 3.10 veya üstü
-- **Firecrawl API Key** & **Google Gemini API Key**
+Projeyi çalıştırmak için aşağıdaki iki API anahtarı gereklidir:
 
-### Kurulum
+1. **Google Gemini API Key:** [Google AI Studio](https://aistudio.google.com/) üzerinden ücretsiz temin edilebilir.
+2. **Firecrawl API Key:** [Firecrawl.dev](https://www.firecrawl.dev/) üzerinden ücretsiz temin edilebilir.
+3. **Node.js & npx:** Firecrawl MCP aracını arka planda çalıştırmak için sisteminizde Node.js (v18+) kurulu olmalıdır.
 
+---
+
+## 🚀 Kurulum ve Başlangıç
+
+### 1. Depoyu Klonlayın
 ```bash
 git clone https://github.com/yucel-gumus/Firecrawl_MCP-Gemini-LangGraph.git
 cd Firecrawl_MCP-Gemini-LangGraph
+```
 
-# Sanal ortam
+### 2. Sanal Ortam Oluşturun ve Bağımlılıkları Yükleyin
+```bash
+# Sanal ortam oluşturma (Python 3.10+)
 python3 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate  # macOS / Linux
+# veya: .venv\Scripts\activate  # Windows
 
-# Bağımlılıklar
+# Bağımlılıkları yükleyin
 pip install -r requirements.txt
 ```
 
-### Ortam Değişkenleri (`.env`)
-
-```env
-FIRECRAWL_API_KEY=your_firecrawl_api_key
-GEMINI_API_KEY=your_gemini_api_key
-```
-
-### Çalıştırma
-
-**Komut Satırı (CLI) Modu:**
+### 3. Çevre Değişkenlerini Tanımlayın
+`.env.example` dosyasını kopyalayarak `.env` oluşturun ve API anahtarlarınızı ekleyin:
 ```bash
-python main.py --url https://example.com
+cp .env.example .env
+```
+`.env` dosya içeriği:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+FIRECRAWL_API_KEY=your_firecrawl_api_key_here
 ```
 
-**Web Arayüzü (FastAPI) Modu:**
+---
+
+## 🖥️ Kullanım Yöntemleri
+
+### A) Web Arayüzünü Başlatma (FastAPI)
 ```bash
 python app.py
 ```
-Arayüze `http://localhost:8000` adresinden erişebilirsiniz.
+Tarayıcınızda `http://127.0.0.1:8000` adresini açın. Analiz etmek istediğiniz URL'yi girip **"Analiz Başlat"** butonuna basarak sekmeli analiz paneline ve PDF raporunuza erişin.
 
 ---
 
-## 📂 Proje Dizin Yapısı
+### B) Komut Satırından (CLI) Çalıştırma
+Herhangi bir URL'yi doğrudan terminal üzerinden analiz etmek için:
+```bash
+# Temel çalıştırma
+python main.py https://openai.com/tr-TR/index/openai-api/
+
+# Detaylı benchmark ve süre dağılımı ile çalıştırma
+python main.py https://openai.com/tr-TR/index/openai-api/ --benchmark
+
+# Özel bir model belirterek çalıştırma
+python main.py https://openai.com/tr-TR/index/openai-api/ --model gemini-3.7-flash
+```
+
+---
+
+## 📁 Proje Dosya Yapısı
 
 ```
 Firecrawl_MCP-Gemini-LangGraph/
-├── requirements.txt
-├── app.py                          # FastAPI Web sunucusu
-├── main.py                         # CLI ve LangGraph motoru
-├── benchmark_results.json          # Performans analiz verileri
-├── web_summary.json                # Üretilen son yapısal özet
-└── templates/
-    └── index.html                  # Web arayüzü şablonu
+├── app.py                   # FastAPI web sunucusu ve API uç noktaları
+├── core.py                  # LangGraph StateGraph, MCP ve Gemini analiz çekirdeği
+├── main.py                  # CLI runner ve benchmark terminal raporlayıcısı
+├── requirements.txt         # Sadeleştirilmiş ve test edilmiş bağımlılıklar listesi
+├── templates/
+│   └── index.html           # Sekmeli araştırma paneli ve kurumsal A4 PDF şablonu
+├── .env.example             # Çevre değişkenleri şablonu
+├── .gitignore               # Hassas verileri ve çıktıları koruyan git kuralları
+└── README.md                # Kapsamlı proje dokümantasyonu
 ```
 
 ---
 
-## 📄 Lisans
-Bu proje [MIT Lisansı](LICENSE) ile lisanslanmıştır.
+## 🛡️ Güvenlik
+
+* `.env` dosyası ve tüm API anahtarları `.gitignore` kapsamındadır ve depoya dahil edilmez.
+* Girdi URL'leri ve Pydantic şema doğrulamaları tip güvenliği standartlarına uygundur.
 
 ---
 
-## 👨‍💻 Geliştirici & İletişim
+## 👨‍💻 Geliştirici
 
-**Yücel Gümüş** - Full Stack Developer
-
-- 🌐 **Web Sitesi / Portfolyo:** [yucelgumus.dev](https://www.yucelgumus.dev/)
-- 💼 **LinkedIn:** [linkedin.com/in/yucel-gumus](https://www.linkedin.com/in/yucel-gumus/)
-- 🐙 **GitHub:** [@yucel-gumus](https://github.com/yucel-gumus)
-
-<p align="left">
-  <a href="https://www.yucelgumus.dev/" target="_blank" rel="noopener noreferrer">
-    <img src="https://img.shields.io/badge/Developed%20by-Yücel%20Gümüş-blue?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Yücel Gümüş Portfolio" />
-  </a>
-</p>
+**Yücel Gümüş**  
+* Website: [yucelgumus.dev](https://www.yucelgumus.dev/)  
+* GitHub: [@yucel-gumus](https://github.com/yucel-gumus)

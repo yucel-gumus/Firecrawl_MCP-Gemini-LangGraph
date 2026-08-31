@@ -1,95 +1,1427 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Summarizer</title>
+    <title>Web İçerik Analizi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        :root {
+            --bg-page: #090d16;
+            --bg-surface: #101623;
+            --bg-surface-elevated: #161e30;
+            --bg-surface-hover: #1c263d;
+            --bg-input: #0b0f19;
+            
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-default: rgba(255, 255, 255, 0.1);
+            --border-active: rgba(99, 102, 241, 0.5);
+
+            --text-title: #ffffff;
+            --text-body: #cbd5e1;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+
+            --brand-primary: #4f46e5;
+            --brand-primary-hover: #4338ca;
+            --brand-primary-glow: rgba(79, 70, 229, 0.25);
+            
+            --accent-blue: #38bdf8;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 22px;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            background-color: #f0f2f5;
+            padding: 0;
         }
-        .container {
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-page);
+            color: var(--text-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            background-image: 
+                radial-gradient(ellipse 60% 40% at 50% -10%, rgba(79, 70, 229, 0.12), transparent 70%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, transparent 100%);
+        }
+
+        /* --- Main Layout Grid --- */
+        .workspace-shell {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 3rem 1.5rem 4rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* --- Title Header --- */
+        .hero-lead {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
             text-align: center;
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            align-items: center;
+            margin-bottom: 0.5rem;
         }
-        h1 {
-            color: #333;
+
+        .hero-lead-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: #ffffff;
+            text-align: center;
         }
-        input[type="url"] {
-            width: 300px;
-            padding: 10px;
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+
+        /* --- Search & Control Bar --- */
+        .command-bar {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            padding: 8px 10px 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        button {
-            padding: 10px 20px;
-            margin-top: 10px;
+
+        .command-bar:focus-within {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px var(--brand-primary-glow), 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+            background: #121929;
+        }
+
+        .command-icon {
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+        }
+
+        .url-input-field {
+            flex: 1;
+            background: transparent;
             border: none;
-            background-color: #007bff;
-            color: white;
-            border-radius: 6px;
+            outline: none;
+            color: #ffffff;
+            font-size: 0.98rem;
+            font-family: inherit;
+            min-width: 250px;
+        }
+
+        .url-input-field::placeholder {
+            color: var(--text-dim);
+        }
+
+        .btn-analyze {
+            background: var(--brand-primary);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-md);
+            padding: 10px 22px;
+            font-size: 0.92rem;
+            font-weight: 600;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.15s ease;
+            white-space: nowrap;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        .btn-analyze:hover:not(:disabled) {
+            background: var(--brand-primary-hover);
+            transform: translateY(-1px);
         }
-        #result {
-            margin-top: 20px;
+
+        .btn-analyze:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .quick-presets-strip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: -0.5rem;
+        }
+
+        .preset-tag {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            padding: 4px 11px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+
+        .preset-tag:hover {
+            background: var(--bg-surface-elevated);
+            color: var(--text-title);
+            border-color: var(--border-default);
+        }
+
+        /* --- Loading State Display --- */
+        .loading-pane {
+            display: none;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 3.5rem 2rem;
+            text-align: center;
+        }
+
+        .progress-spinner {
+            width: 38px;
+            height: 38px;
+            border: 3px solid rgba(99, 102, 241, 0.15);
+            border-top-color: var(--brand-primary);
+            border-radius: 50%;
+            animation: spin 0.85s linear infinite;
+            margin: 0 auto 1.25rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-title-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .loading-subtext {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        /* --- Results Canvas & Tab Architecture --- */
+        .results-canvas {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Canvas Top Summary Bar */
+        .canvas-header-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .target-source-block {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 250px;
+        }
+
+        .target-url-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-dim);
+        }
+
+        .target-url-value {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-title);
+            max-width: 500px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .export-actions-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-export-pdf {
+            background: #ffffff;
+            color: #0f172a;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-export-pdf:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+        }
+
+        .btn-export-secondary {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-default);
+            color: var(--text-body);
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.84rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-export-secondary:hover {
+            background: var(--bg-surface-hover);
+            color: #ffffff;
+            border-color: var(--text-muted);
+        }
+
+        /* 4-Stat Metric Dashboard */
+        .metric-grid-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 820px) {
+            .metric-grid-strip {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .metric-card-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+        }
+
+        .metric-card-tag {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            margin-bottom: 2px;
+        }
+
+        .metric-card-number {
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* Interactive Section Navigation Tabs */
+        .tabs-header-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 2px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 9px 16px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: #ffffff;
+            background: var(--bg-surface-elevated);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 12px;
+            right: 12px;
+            height: 2px;
+            background: var(--brand-primary);
+            border-radius: 2px;
+        }
+
+        /* Tab Content Panes */
+        .tab-pane {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .tab-pane.active {
+            display: flex;
+        }
+
+        /* Content Cards & Modules */
+        .content-module {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+        }
+
+        .module-title-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .module-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.01em;
+        }
+
+        .editorial-prose {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+            white-space: pre-line;
+        }
+
+        /* Topics Multi-Card Layout */
+        .topic-cards-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .topic-article-box {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.35rem;
+        }
+
+        .topic-article-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .topic-article-desc {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .topic-sub-points {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 10px;
+        }
+
+        .topic-sub-points li {
+            font-size: 0.88rem;
+            color: #cbd5e1;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .topic-sub-points li::before {
+            content: "•";
+            position: absolute;
+            left: 2px;
+            color: var(--accent-blue);
+            font-weight: 800;
+        }
+
+        /* Real Data Table */
+        .table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+        }
+
+        .intelligence-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
             text-align: left;
-            white-space: pre-wrap;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 6px;
+        }
+
+        .intelligence-table th {
+            background: var(--bg-surface-elevated);
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 11px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .intelligence-table td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            color: #cbd5e1;
+            vertical-align: top;
+        }
+
+        .intelligence-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .intelligence-table .metric-badge-col {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: #fbbf24;
+            white-space: nowrap;
+        }
+
+        /* 2-Column Findings & Roadmaps */
+        .dual-card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        @media (max-width: 860px) {
+            .dual-card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .structured-bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .structured-bullet-list li {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+        }
+
+        .structured-bullet-list.findings-style li {
+            border-left: 3px solid var(--accent-emerald);
+        }
+
+        .structured-bullet-list.actions-style li {
+            border-left: 3px solid var(--brand-primary);
+        }
+
+        /* Entity Tag Matrix */
+        .entity-matrix-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .entity-chip-item {
+            font-size: 0.84rem;
+            font-weight: 500;
+            color: #ffffff;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-default);
+            padding: 5px 12px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Code Terminal Viewer */
+        pre.source-terminal {
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            color: #38bdf8;
+            font-family: var(--font-mono);
+            font-size: 0.84rem;
             max-height: 400px;
             overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        /* Toast Feedback */
+        .app-toast-alert {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1e293b;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 11px 20px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 100;
+        }
+
+        /* Error Notification Banner */
+        .error-banner-alert {
+            display: none;
+            background: rgba(244, 63, 94, 0.08);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            color: #fb7185;
+            font-size: 0.92rem;
+        }
+
+        /* Empty State */
+        .empty-placeholder {
+            background: var(--bg-surface);
+            border: 1px dashed var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .empty-placeholder-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .empty-placeholder-sub {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Global Footer */
+        footer {
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-surface);
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.82rem;
+            color: var(--text-dim);
+        }
+
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+        footer a:hover { color: #ffffff; }
+
+        /* ==========================================================================
+           EXECUTIVE A4 PRINT/PDF DOCUMENT (CLEAN VECTOR LAYOUT)
+           ========================================================================== */
+        #pdf-render-wrapper {
+            display: none;
+        }
+
+        .pdf-memo-container {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 45px 50px;
+            font-family: var(--font-sans);
+            width: 820px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .pdf-memo-header {
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .pdf-memo-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+        }
+
+        .pdf-memo-sub {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .pdf-meta-box-clean {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-bottom: 18px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .pdf-meta-box-clean td {
+            padding: 6px 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .pdf-heading-block {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #0f172a;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+            margin-top: 18px;
+            margin-bottom: 10px;
+        }
+
+        .pdf-exec-paragraph {
+            font-size: 11px;
+            line-height: 1.7;
+            color: #1e293b;
+            margin-bottom: 14px;
+            text-align: justify;
+        }
+
+        .pdf-topic-card-print {
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
+        .pdf-topic-name-print {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        .pdf-topic-desc-print {
+            font-size: 10px;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+
+        .pdf-topic-bullets-print {
+            list-style: none;
+            padding-left: 0;
+            font-size: 10px;
+            color: #334155;
+        }
+
+        .pdf-topic-bullets-print li {
+            padding-left: 12px;
+            position: relative;
+            margin-bottom: 2px;
+        }
+
+        .pdf-topic-bullets-print li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #4f46e5;
+        }
+
+        .pdf-table-print {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-bottom: 14px;
+        }
+
+        .pdf-table-print th {
+            background: #f1f5f9;
+            color: #0f172a;
+            font-weight: 700;
+            padding: 6px 8px;
+            border: 1px solid #cbd5e1;
+            text-align: left;
+        }
+
+        .pdf-table-print td {
+            padding: 6px 8px;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+        }
+
+        .pdf-list-print {
+            list-style: none;
+            padding-left: 0;
+            font-size: 10px;
+        }
+
+        .pdf-list-print li {
+            padding-left: 14px;
+            position: relative;
+            margin-bottom: 5px;
+            color: #334155;
+        }
+
+        .pdf-list-print li::before {
+            content: "—";
+            position: absolute;
+            left: 0;
+            color: #64748b;
+        }
+
+        .pdf-footer-clean {
+            margin-top: 25px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #94a3b8;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>URL Summarizer Agent</h1>
-        <form id="url-form">
-            <input type="url" id="url" name="url" placeholder="Enter URL to summarize" required>
-            <br>
-            <button type="submit">Summarize</button>
+
+    <!-- Main Workspace Container -->
+    <main class="workspace-shell">
+        
+        <!-- Header Title -->
+        <div class="hero-lead">
+            <h1 class="hero-lead-title">Web İçerik Analizi</h1>
+        </div>
+
+        <!-- Search Bar -->
+        <form id="intelligence-form">
+            <div class="command-bar">
+                <div class="command-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </div>
+                <input 
+                    type="url" 
+                    id="url-input" 
+                    class="url-input-field" 
+                    placeholder="Analiz edilecek sayfanın tam URL'sini girin (https://...)" 
+                    required 
+                    autocomplete="off"
+                >
+                <button type="submit" id="submit-btn" class="btn-analyze">
+                    <span>Analiz Başlat</span>
+                </button>
+            </div>
         </form>
-        <pre id="result"></pre>
+
+        <div class="quick-presets-strip">
+            <span>Örnek Bağlantılar:</span>
+            <span class="preset-tag" onclick="setUrl('https://openai.com/tr-TR/index/openai-api/')">OpenAI API Duyurusu</span>
+            <span class="preset-tag" onclick="setUrl('https://news.ycombinator.com')">Hacker News</span>
+            <span class="preset-tag" onclick="setUrl('https://en.wikipedia.org/wiki/Artificial_intelligence')">Wikipedia AI</span>
+            <span class="preset-tag" onclick="setUrl('https://python.org')">Python.org</span>
+        </div>
+
+        <!-- Error Notification -->
+        <div id="error-banner" class="error-banner-alert"></div>
+
+        <!-- Loading State View -->
+        <div id="loading-view" class="loading-pane">
+            <div class="progress-spinner"></div>
+            <div class="loading-title-text">Sayfa Analiz Ediliyor</div>
+            <div class="loading-subtext">Firecrawl MCP saf metni kazıyor ve Gemini 3.7 Flash derinlemesine sentezliyor...</div>
+        </div>
+
+        <!-- Empty State (Shown before any query) -->
+        <div id="empty-state-view" class="empty-placeholder">
+            <div class="empty-placeholder-title">Henüz Bir Analiz Başlatılmadı</div>
+            <div class="empty-placeholder-sub">Yukarıdaki alana dilediğiniz bir makale, dokümantasyon veya haber bağlantısını yapıştırarak tam teşekküllü istihbarat raporu oluşturun.</div>
+        </div>
+
+        <!-- Main Results Canvas -->
+        <div id="results-canvas" class="results-canvas">
+            
+            <!-- Canvas Header & Toolbar -->
+            <div class="canvas-header-card">
+                <div class="target-source-block">
+                    <span class="target-url-label">Analiz Edilen Kaynak:</span>
+                    <span id="display-target-url" class="target-url-value">--</span>
+                </div>
+
+                <div class="export-actions-row">
+                    <button type="button" class="btn-export-pdf" id="btn-pdf-export" onclick="generatePdfReport()">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <span>PDF Raporu İndir</span>
+                    </button>
+                    <button type="button" class="btn-export-secondary" onclick="copyMarkdownOutput()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                        <span>Markdown</span>
+                    </button>
+                    <button type="button" class="btn-export-secondary" onclick="copyJsonOutput()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                        <span>JSON</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4-Stat Metric Dashboard -->
+            <div class="metric-grid-strip">
+                <div class="metric-card-box">
+                    <div class="metric-card-tag">Toplam Süre</div>
+                    <div class="metric-card-number" id="metric-total-time">0.00s</div>
+                </div>
+                <div class="metric-card-box">
+                    <div class="metric-card-tag">Firecrawl Kazıma</div>
+                    <div class="metric-card-number" id="metric-scrape-time" style="color: #fed7aa;">0.00s</div>
+                </div>
+                <div class="metric-card-box">
+                    <div class="metric-card-tag">Gemini Analiz</div>
+                    <div class="metric-card-number" id="metric-llm-time" style="color: #a7f3d0;">0.00s</div>
+                </div>
+                <div class="metric-card-box">
+                    <div class="metric-card-tag">Kazınan İçerik</div>
+                    <div class="metric-card-number" id="metric-content-size" style="color: #a5f3fc;">0 kar.</div>
+                </div>
+            </div>
+
+            <!-- Section Navigation Tabs -->
+            <div class="tabs-header-bar">
+                <button type="button" class="tab-btn active" onclick="switchTab('overview')">Genel Bakış & Özet</button>
+                <button type="button" class="tab-btn" onclick="switchTab('topics')">Konu Kırılımları</button>
+                <button type="button" class="tab-btn" onclick="switchTab('data')">Veri & İstatistik Tablosu</button>
+                <button type="button" class="tab-btn" onclick="switchTab('insights')">Bulgular & Aksiyon Planı</button>
+                <button type="button" class="tab-btn" onclick="switchTab('entities')">Bahsedilen Varlıklar</button>
+                <button type="button" class="tab-btn" onclick="switchTab('raw')">Ham JSON</button>
+            </div>
+
+            <!-- Tab 1: Overview & Executive Summary -->
+            <div id="tab-pane-overview" class="tab-pane active">
+                <div class="content-module">
+                    <div class="module-title-bar">
+                        <div class="module-title">Yönetici Özeti (Executive Summary)</div>
+                    </div>
+                    <div class="editorial-prose" id="view-exec-summary">--</div>
+                </div>
+
+                <div class="dual-card-grid">
+                    <div class="content-module">
+                        <div class="module-title-bar">
+                            <div class="module-title" style="font-size: 0.95rem;">Öne Çıkan Bulgular</div>
+                        </div>
+                        <ul class="structured-bullet-list findings-style" id="view-preview-findings"></ul>
+                    </div>
+
+                    <div class="content-module">
+                        <div class="module-title-bar">
+                            <div class="module-title" style="font-size: 0.95rem;">Önerilen Eylem Maddeleri</div>
+                        </div>
+                        <ul class="structured-bullet-list actions-style" id="view-preview-actions"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Detailed Topics Breakdown -->
+            <div id="tab-pane-topics" class="tab-pane">
+                <div class="content-module">
+                    <div class="module-title-bar">
+                        <div class="module-title">Detaylı Konu Kırılımları ve Analizler</div>
+                    </div>
+                    <div class="topic-cards-stack" id="view-topics-container"></div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Data & Statistics Table -->
+            <div id="tab-pane-data" class="tab-pane">
+                <div class="content-module">
+                    <div class="module-title-bar">
+                        <div class="module-title">Somut Veriler, İstatistikler ve Metrikler</div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="intelligence-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%;">Metrik / Konu</th>
+                                    <th style="width: 20%;">Değer</th>
+                                    <th style="width: 55%;">Bağlam / Açıklama</th>
+                                </tr>
+                            </thead>
+                            <tbody id="view-stats-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Strategic Insights & Roadmap -->
+            <div id="tab-pane-insights" class="tab-pane">
+                <div class="dual-card-grid">
+                    <div class="content-module">
+                        <div class="module-title-bar">
+                            <div class="module-title">Stratejik Bulgular & Çıkarımlar</div>
+                        </div>
+                        <ul class="structured-bullet-list findings-style" id="view-full-findings"></ul>
+                    </div>
+
+                    <div class="content-module">
+                        <div class="module-title-bar">
+                            <div class="module-title">Uygulanabilir Eylem Maddeleri</div>
+                        </div>
+                        <ul class="structured-bullet-list actions-style" id="view-full-actions"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 5: Entities & Technologies -->
+            <div id="tab-pane-entities" class="tab-pane">
+                <div class="content-module">
+                    <div class="module-title-bar">
+                        <div class="module-title">Tespit Edilen Şirketler, Modeller ve Teknolojiler</div>
+                    </div>
+                    <div class="entity-matrix-box" id="view-entities-container"></div>
+                </div>
+            </div>
+
+            <!-- Tab 6: Raw JSON -->
+            <div id="tab-pane-raw" class="tab-pane">
+                <div class="content-module">
+                    <div class="module-title-bar">
+                        <div class="module-title">Yapılandırılmış JSON Şeması</div>
+                    </div>
+                    <pre class="source-terminal" id="view-raw-json"></pre>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="app-toast" class="app-toast-alert">Bildirim</div>
+
+    <!-- Hidden Dedicated Printable PDF Document (A4 Clean Layout) -->
+    <div id="pdf-render-wrapper">
+        <div id="pdf-document" class="pdf-memo-container">
+            <div class="pdf-memo-header">
+                <div>
+                    <div class="pdf-memo-title">WEB İÇERİK ANALİZ RAPORU</div>
+                    <div class="pdf-memo-sub">Motor: Firecrawl MCP • Analiz Modeli: Google Gemini 3.7 Flash</div>
+                </div>
+                <div style="text-align: right; font-size: 9.5px; color: #64748b;">
+                    <div>Rapor No: <strong id="pdf-report-id">001</strong></div>
+                    <div>Tarih: <strong id="pdf-date">--</strong></div>
+                </div>
+            </div>
+
+            <table class="pdf-meta-box-clean">
+                <tr>
+                    <td style="width: 18%; font-weight: 700; color: #475569;">Kaynak URL:</td>
+                    <td style="color: #2563eb; word-break: break-all;" id="pdf-url-text">--</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700; color: #475569;">Performans:</td>
+                    <td id="pdf-perf-text">--</td>
+                </tr>
+            </table>
+
+            <div class="pdf-heading-block">1. Yönetici Özeti (Executive Summary)</div>
+            <div class="pdf-exec-paragraph" id="pdf-exec-text">--</div>
+
+            <div class="pdf-heading-block">2. Detaylı Konu Kırılımları</div>
+            <div id="pdf-topics-container"></div>
+
+            <div class="pdf-heading-block">3. Somut Veriler ve İstatistikler</div>
+            <table class="pdf-table-print">
+                <thead>
+                    <tr>
+                        <th style="width: 28%;">Metrik</th>
+                        <th style="width: 22%;">Değer</th>
+                        <th style="width: 50%;">Bağlam</th>
+                    </tr>
+                </thead>
+                <tbody id="pdf-stats-tbody"></tbody>
+            </table>
+
+            <div class="pdf-heading-block">4. Stratejik Bulgular ve Çıkarımlar</div>
+            <ul class="pdf-list-print" id="pdf-findings-list"></ul>
+
+            <div class="pdf-heading-block">5. Uygulanabilir Eylem Maddeleri</div>
+            <ul class="pdf-list-print" id="pdf-takeaways-list"></ul>
+
+            <div class="pdf-footer-clean">
+                <span>Web İçerik Analizi • Firecrawl MCP & Gemini LangGraph Agent</span>
+                <span>Geliştirici: Yücel Gümüş (yucelgumus.dev)</span>
+            </div>
+        </div>
     </div>
 
+    <!-- Footer -->
+    <footer>
+        <p>Web İçerik Analizi • Geliştirici: <a href="https://www.yucelgumus.dev/" target="_blank" rel="noopener noreferrer">Yücel Gümüş</a></p>
+    </footer>
+
     <script>
-        document.getElementById('url-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const url = document.getElementById('url').value;
-            const resultDiv = document.getElementById('result');
-            resultDiv.textContent = 'Processing...';
+        let currentResultData = null;
+        let currentUrl = '';
+        let currentDurations = {};
+        let currentStats = {};
+
+        function setUrl(url) {
+            document.getElementById('url-input').value = url;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('app-toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2500);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+            event.target.classList.add('active');
+            const targetPane = document.getElementById(`tab-pane-${tabId}`);
+            if (targetPane) {
+                targetPane.classList.add('active');
+            }
+        }
+
+        function copyJsonOutput() {
+            if (!currentResultData) return;
+            navigator.clipboard.writeText(JSON.stringify(currentResultData, null, 2)).then(() => {
+                showToast('JSON çıktısı panoya kopyalandı.');
+            });
+        }
+
+        function copyMarkdownOutput() {
+            if (!currentResultData) return;
+            let md = `# Web İçerik Analizi Raporu\n\n**Kaynak URL:** ${currentUrl}\n\n## 1. Yönetici Özeti\n${currentResultData.executive_summary || ''}\n\n## 2. Detaylı Konu Kırılımları\n`;
+            (currentResultData.topics || []).forEach(t => {
+                md += `\n### ${t.topic}\n${t.details}\n`;
+                (t.key_points || []).forEach(p => { md += `- ${p}\n`; });
+            });
+            md += `\n## 3. Stratejik Bulgular\n`;
+            (currentResultData.key_findings || []).forEach(f => { md += `- ${f}\n`; });
+            md += `\n## 4. Eylem Maddeleri\n`;
+            (currentResultData.actionable_takeaways || []).forEach(a => { md += `- ${a}\n`; });
+
+            navigator.clipboard.writeText(md).then(() => {
+                showToast('Markdown formatında panoya kopyalandı.');
+            });
+        }
+
+        // --- Executive PDF Generation ---
+        function generatePdfReport() {
+            if (!currentResultData) {
+                showToast('Önce bir URL analiz etmelisiniz.');
+                return;
+            }
+
+            const pdfBtn = document.getElementById('btn-pdf-export');
+            const originalText = pdfBtn.innerHTML;
+            pdfBtn.innerHTML = '<span>PDF Hazırlanıyor...</span>';
+            pdfBtn.disabled = true;
+
+            const now = new Date();
+            document.getElementById('pdf-report-id').textContent = 'R-' + Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('pdf-date').textContent = now.toLocaleDateString('tr-TR') + ' ' + now.toLocaleTimeString('tr-TR');
+            document.getElementById('pdf-url-text').textContent = currentUrl;
+            document.getElementById('pdf-perf-text').textContent = `Toplam Süre: ${(currentDurations.total_seconds || 0).toFixed(2)}s | Kazınan Boyut: ${(currentStats.scraped_content_length || 0).toLocaleString()} karakter`;
+
+            // Exec text
+            document.getElementById('pdf-exec-text').textContent = currentResultData.executive_summary || 'Özet bulunamadı.';
+
+            // Topics
+            const pdfTopics = document.getElementById('pdf-topics-container');
+            pdfTopics.innerHTML = '';
+            (currentResultData.topics || []).forEach(t => {
+                const box = document.createElement('div');
+                box.className = 'pdf-topic-card-print';
+                let subBullets = '';
+                (t.key_points || []).forEach(bp => {
+                    subBullets += `<li>${bp}</li>`;
+                });
+                box.innerHTML = `
+                    <div class="pdf-topic-name-print">${t.topic || 'Konu'}</div>
+                    <div class="pdf-topic-desc-print">${t.details || ''}</div>
+                    <ul class="pdf-topic-bullets-print">${subBullets}</ul>
+                `;
+                pdfTopics.appendChild(box);
+            });
+
+            // Stats
+            const pdfStatsTbody = document.getElementById('pdf-stats-tbody');
+            pdfStatsTbody.innerHTML = '';
+            (currentResultData.statistics || []).forEach(s => {
+                const tr = document.createElement('tr');
+                if (typeof s === 'object') {
+                    tr.innerHTML = `
+                        <td style="font-weight: 600;">${s.metric || ''}</td>
+                        <td style="font-weight: 700; color: #0f172a;">${s.value || ''}</td>
+                        <td>${s.context || ''}</td>
+                    `;
+                } else {
+                    tr.innerHTML = `<td colspan="3">${s}</td>`;
+                }
+                pdfStatsTbody.appendChild(tr);
+            });
+            if (!currentResultData.statistics || currentResultData.statistics.length === 0) {
+                pdfStatsTbody.innerHTML = '<tr><td colspan="3" style="color: #94a3b8;">Metinde sayısal veri tespit edilmedi.</td></tr>';
+            }
+
+            // Findings
+            const pdfFindings = document.getElementById('pdf-findings-list');
+            pdfFindings.innerHTML = '';
+            (currentResultData.key_findings || []).forEach(f => {
+                const li = document.createElement('li');
+                li.textContent = f;
+                pdfFindings.appendChild(li);
+            });
+
+            // Takeaways
+            const pdfTakeaways = document.getElementById('pdf-takeaways-list');
+            pdfTakeaways.innerHTML = '';
+            (currentResultData.actionable_takeaways || []).forEach(a => {
+                const li = document.createElement('li');
+                li.textContent = a;
+                pdfTakeaways.appendChild(li);
+            });
+
+            let domain = 'analiz_raporu';
+            try {
+                domain = new URL(currentUrl).hostname.replace('www.', '');
+            } catch(e) {}
+            const fileName = `Rapor_${domain}_${now.toISOString().slice(0, 10)}.pdf`;
+
+            const element = document.getElementById('pdf-document');
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: fileName,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                showToast('PDF raporu başarıyla indirildi.');
+                pdfBtn.innerHTML = originalText;
+                pdfBtn.disabled = false;
+            }).catch(err => {
+                console.error(err);
+                showToast('PDF oluşturulurken hata: ' + err.message);
+                pdfBtn.innerHTML = originalText;
+                pdfBtn.disabled = false;
+            });
+        }
+
+        // --- Form Submit & Orchestration ---
+        document.getElementById('intelligence-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const urlInput = document.getElementById('url-input');
+            const submitBtn = document.getElementById('submit-btn');
+            const loadingView = document.getElementById('loading-view');
+            const emptyState = document.getElementById('empty-state-view');
+            const resultsCanvas = document.getElementById('results-canvas');
+            const errorBanner = document.getElementById('error-banner');
+
+            const url = urlInput.value.trim();
+            if (!url) return;
+            currentUrl = url;
+
+            errorBanner.style.display = 'none';
+            emptyState.style.display = 'none';
+            resultsCanvas.style.display = 'none';
+            loadingView.style.display = 'block';
+            submitBtn.disabled = true;
 
             try {
                 const response = await fetch('/summarize', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ url: url })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url, model: 'gemini-3.7-flash' })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+
+                if (!response.ok || data.success === false) {
+                    throw new Error(data.error || `Sunucu hatası (${response.status})`);
                 }
 
-                const data = await response.json();
-                resultDiv.textContent = JSON.stringify(data, null, 2);
-            } catch (error) {
-                resultDiv.textContent = 'Error: ' + error.message;
+                currentResultData = data.summary || data;
+                currentDurations = data.durations || {};
+                currentStats = data.content_stats || {};
+
+                // Target URL & Metrics
+                document.getElementById('display-target-url').textContent = url;
+                document.getElementById('metric-total-time').textContent = (currentDurations.total_seconds || 0).toFixed(2) + 's';
+                document.getElementById('metric-scrape-time').textContent = (currentDurations.scraping_seconds || 0).toFixed(2) + 's';
+                document.getElementById('metric-llm-time').textContent = (currentDurations.llm_processing_seconds || 0).toFixed(2) + 's';
+                document.getElementById('metric-content-size').textContent = (currentStats.scraped_content_length || 0).toLocaleString() + ' kar.';
+
+                // 1. Executive Summary
+                document.getElementById('view-exec-summary').textContent = currentResultData.executive_summary || 'Özet bilgisi bulunamadı.';
+
+                // 2. Preview Findings & Actions (in Overview Tab)
+                const previewFindings = document.getElementById('view-preview-findings');
+                previewFindings.innerHTML = '';
+                (currentResultData.key_findings || []).slice(0, 3).forEach(f => {
+                    const li = document.createElement('li');
+                    li.textContent = f;
+                    previewFindings.appendChild(li);
+                });
+
+                const previewActions = document.getElementById('view-preview-actions');
+                previewActions.innerHTML = '';
+                (currentResultData.actionable_takeaways || []).slice(0, 3).forEach(a => {
+                    const li = document.createElement('li');
+                    li.textContent = a;
+                    previewActions.appendChild(li);
+                });
+
+                // 3. Topics Stack
+                const topicsContainer = document.getElementById('view-topics-container');
+                topicsContainer.innerHTML = '';
+                (currentResultData.topics || []).forEach(t => {
+                    const card = document.createElement('div');
+                    card.className = 'topic-article-box';
+                    let subBullets = '';
+                    (t.key_points || []).forEach(p => {
+                        subBullets += `<li>${p}</li>`;
+                    });
+                    card.innerHTML = `
+                        <div class="topic-article-name">${t.topic || 'Konu'}</div>
+                        <div class="topic-article-desc">${t.details || ''}</div>
+                        <ul class="topic-sub-points">${subBullets}</ul>
+                    `;
+                    topicsContainer.appendChild(card);
+                });
+                if (!currentResultData.topics || currentResultData.topics.length === 0) {
+                    topicsContainer.innerHTML = '<p style="color: var(--text-muted);">Konu kırılımı bulunamadı.</p>';
+                }
+
+                // 4. Statistics Table
+                const statsTbody = document.getElementById('view-stats-tbody');
+                statsTbody.innerHTML = '';
+                (currentResultData.statistics || []).forEach(s => {
+                    const tr = document.createElement('tr');
+                    if (typeof s === 'object') {
+                        tr.innerHTML = `
+                            <td style="font-weight: 600; color: #ffffff;">${s.metric || 'Metrik'}</td>
+                            <td class="metric-badge-col">${s.value || ''}</td>
+                            <td>${s.context || ''}</td>
+                        `;
+                    } else {
+                        tr.innerHTML = `<td colspan="3">${s}</td>`;
+                    }
+                    statsTbody.appendChild(tr);
+                });
+                if (!currentResultData.statistics || currentResultData.statistics.length === 0) {
+                    statsTbody.innerHTML = '<tr><td colspan="3" style="color: var(--text-dim); padding: 14px;">Metinde somut istatistiki veri tespit edilmedi.</td></tr>';
+                }
+
+                // 5. Full Findings & Actions Tab
+                const fullFindings = document.getElementById('view-full-findings');
+                fullFindings.innerHTML = '';
+                (currentResultData.key_findings || []).forEach(f => {
+                    const li = document.createElement('li');
+                    li.textContent = f;
+                    fullFindings.appendChild(li);
+                });
+
+                const fullActions = document.getElementById('view-full-actions');
+                fullActions.innerHTML = '';
+                (currentResultData.actionable_takeaways || []).forEach(a => {
+                    const li = document.createElement('li');
+                    li.textContent = a;
+                    fullActions.appendChild(li);
+                });
+
+                // 6. Entities
+                const entitiesContainer = document.getElementById('view-entities-container');
+                entitiesContainer.innerHTML = '';
+                (currentResultData.entities_and_technologies || []).forEach(e => {
+                    const chip = document.createElement('span');
+                    chip.className = 'entity-chip-item';
+                    chip.textContent = e;
+                    entitiesContainer.appendChild(chip);
+                });
+
+                // 7. Raw JSON
+                document.getElementById('view-raw-json').textContent = JSON.stringify(currentResultData, null, 2);
+
+                // Reveal Canvas
+                loadingView.style.display = 'none';
+                resultsCanvas.style.display = 'flex';
+
+            } catch (err) {
+                loadingView.style.display = 'none';
+                emptyState.style.display = 'block';
+                errorBanner.textContent = 'Hata: ' + err.message;
+                errorBanner.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
             }
         });
     </script>
