@@ -150,7 +150,7 @@ def extract_structured_summary(
     api_key = os.getenv("GEMINI_API_KEY")
     client = genai.Client(
         api_key=api_key,
-        http_options=types.HttpOptions(timeout=10000)
+        http_options=types.HttpOptions(timeout=120000)  # 120 saniye
     )
 
     prompt = f"""
@@ -174,28 +174,33 @@ GÖREV TALİMATLARI:
 Lütfen yüzeysel veya kısa maddeler yerine, okuyucuya tam kapsamlı istihbarat sunacak zenginlikte yanıt ver.
 """
 
-    models_to_try = [preferred_model, "gemini-flash-lite-latest", "gemini-3.5-flash-lite"]
-    unique_models = []
-    for m in models_to_try:
-        if m and m not in unique_models:
-            unique_models.append(m)
+    # Geçerli ve aktif Gemini model isimleri
+    fallback_models = ["gemini-3.7-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite"]
+    models_to_try = [preferred_model] if preferred_model else []
+    for m in fallback_models:
+        if m not in models_to_try:
+            models_to_try.append(m)
 
     last_err = None
-    for model_name in unique_models:
+    for model_name in models_to_try:
         try:
-            resp = client.models.generate_content(
+            # Chat API kullanımı: SDK'nın önerdiği yöntem (AFC uyarısını önler)
+            chat = client.chats.create(
                 model=model_name,
-                contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=WebSummary,
                     temperature=0.1
                 )
             )
+            resp = chat.send_message(prompt)
             return WebSummary.model_validate_json(resp.text)
+        except BrokenPipeError as exc:
+            last_err = exc
+            print(f"Bilgi: '{model_name}' bağlantı hatası (Broken Pipe), sonraki modele geçiliyor...", file=sys.stderr)
         except Exception as exc:
             last_err = exc
-            print(f"Bilgi: '{model_name}' geçici yanıt vermedi, sonraki modele geçiliyor...", file=sys.stderr)
+            print(f"Bilgi: '{model_name}' geçici yanıt vermedi, sonraki modele geçiliyor... ({type(exc).__name__})", file=sys.stderr)
 
     raise RuntimeError(f"Tüm modeller denendi fakat yanıt alınamadı. Son hata: {last_err}")
 

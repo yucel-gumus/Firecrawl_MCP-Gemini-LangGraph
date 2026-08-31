@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web İçerik Analizi</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- html2pdf replaced by native browser print -->
     <style>
         :root {
             --bg-page: #090d16;
@@ -15,7 +18,7 @@
             --bg-surface-elevated: #161e30;
             --bg-surface-hover: #1c263d;
             --bg-input: #0b0f19;
-            
+
             --border-subtle: rgba(255, 255, 255, 0.06);
             --border-default: rgba(255, 255, 255, 0.1);
             --border-active: rgba(99, 102, 241, 0.5);
@@ -28,7 +31,7 @@
             --brand-primary: #4f46e5;
             --brand-primary-hover: #4338ca;
             --brand-primary-glow: rgba(79, 70, 229, 0.25);
-            
+
             --accent-blue: #38bdf8;
             --accent-emerald: #10b981;
             --accent-amber: #f59e0b;
@@ -58,7 +61,7 @@
             flex-direction: column;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
-            background-image: 
+            background-image:
                 radial-gradient(ellipse 60% 40% at 50% -10%, rgba(79, 70, 229, 0.12), transparent 70%),
                 linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, transparent 100%);
         }
@@ -208,7 +211,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .loading-title-text {
@@ -232,8 +237,15 @@
         }
 
         @keyframes fadeSlideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Canvas Top Summary Bar */
@@ -675,68 +687,59 @@
             color: var(--text-muted);
             text-decoration: none;
         }
-        footer a:hover { color: #ffffff; }
+
+        footer a:hover {
+            color: #ffffff;
+        }
 
         /* ==========================================================================
-           EXECUTIVE A4 PRINT/PDF DOCUMENT (FULL A4 WIDTH - 794px CANVAS)
+           PDF DOCUMENT — Screen preview (hidden, shown only during print)
            ========================================================================== */
         #pdf-render-wrapper {
-            position: absolute;
-            left: -9999px;
-            top: 0;
-            width: 794px;
-            background: #ffffff;
-            opacity: 1;
-            z-index: -9999;
-            pointer-events: none;
+            display: none;
         }
 
         .pdf-memo-container {
             background: #ffffff;
             color: #0f172a;
-            padding: 36px 42px;
-            font-family: var(--font-sans);
-            width: 794px;
-            box-sizing: border-box;
-            line-height: 1.55;
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            line-height: 1.6;
             word-wrap: break-word;
             overflow-wrap: break-word;
-            word-break: normal;
         }
 
         .pdf-memo-accent-bar {
-            height: 4px;
-            background: linear-gradient(90deg, #2563eb 0%, #4f46e5 100%);
-            border-radius: 2px;
-            margin-bottom: 16px;
+            height: 5px;
+            background: linear-gradient(90deg, #1d4ed8 0%, #4f46e5 60%, #7c3aed 100%);
+            margin-bottom: 20px;
         }
 
         .pdf-memo-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            border-bottom: 2px solid #0f172a;
-            padding-bottom: 12px;
-            margin-bottom: 16px;
+            border-bottom: 2px solid #1e293b;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
         }
 
         .pdf-memo-title {
-            font-size: 19px;
+            font-size: 18pt;
             font-weight: 800;
             color: #0f172a;
             letter-spacing: -0.02em;
         }
 
         .pdf-memo-sub {
-            font-size: 10.5px;
-            color: #475569;
-            margin-top: 3px;
+            font-size: 9pt;
+            color: #64748b;
+            margin-top: 4px;
             font-weight: 500;
         }
 
         .pdf-meta-col {
             text-align: right;
-            font-size: 10px;
+            font-size: 9pt;
             color: #475569;
         }
 
@@ -745,102 +748,99 @@
             background: #eff6ff;
             color: #1d4ed8;
             border: 1px solid #bfdbfe;
-            padding: 2px 7px;
+            padding: 3px 9px;
             border-radius: 4px;
             font-weight: 700;
-            font-size: 9.5px;
-            margin-bottom: 3px;
+            font-size: 8.5pt;
+            margin-bottom: 4px;
         }
 
         .pdf-meta-box-clean {
             width: 100%;
             table-layout: fixed;
             border-collapse: collapse;
-            font-size: 10px;
-            margin-bottom: 16px;
+            font-size: 9pt;
+            margin-bottom: 18px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            box-sizing: border-box;
         }
 
         .pdf-meta-box-clean td {
-            padding: 7px 10px;
+            padding: 8px 12px;
             border: 1px solid #e2e8f0;
-            word-break: break-word;
+            word-break: break-all;
         }
 
         .pdf-heading-block {
-            font-size: 12px;
+            font-size: 9pt;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: #1e3a8a;
-            border-bottom: 1.5px solid #2563eb;
-            padding-bottom: 4px;
-            margin-top: 18px;
-            margin-bottom: 10px;
+            letter-spacing: 0.06em;
+            color: #1e40af;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 5px;
+            margin-top: 22px;
+            margin-bottom: 12px;
             page-break-after: avoid;
         }
 
         .pdf-exec-paragraph {
-            background: #f8fafc;
+            background: #f0f7ff;
             border-left: 4px solid #2563eb;
-            padding: 12px 16px;
-            border-radius: 0 6px 6px 0;
-            font-size: 11px;
-            line-height: 1.7;
+            padding: 14px 18px;
+            font-size: 10pt;
+            line-height: 1.8;
             color: #1e293b;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             text-align: justify;
             word-break: break-word;
         }
 
         .pdf-topic-card-print {
             border: 1px solid #e2e8f0;
-            background: #ffffff;
-            border-radius: 6px;
-            padding: 10px 14px;
+            background: #fafafa;
+            padding: 12px 16px;
             margin-bottom: 10px;
             box-sizing: border-box;
             page-break-inside: avoid;
         }
 
         .pdf-topic-name-print {
-            font-size: 11.5px;
+            font-size: 10.5pt;
             font-weight: 700;
             color: #0f172a;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
         .pdf-topic-desc-print {
-            font-size: 10.5px;
+            font-size: 9.5pt;
             color: #475569;
-            margin-bottom: 6px;
-            line-height: 1.55;
+            margin-bottom: 8px;
+            line-height: 1.6;
         }
 
         .pdf-topic-bullets-print {
             list-style: none;
             padding-left: 0;
-            font-size: 10px;
+            font-size: 9pt;
             color: #334155;
-            line-height: 1.5;
-            border-top: 1px solid #f1f5f9;
-            padding-top: 5px;
+            line-height: 1.55;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 6px;
+            margin: 0;
         }
 
         .pdf-topic-bullets-print li {
-            padding-left: 12px;
+            padding-left: 14px;
             position: relative;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
         .pdf-topic-bullets-print li::before {
             content: "•";
             position: absolute;
             left: 0;
-            color: #2563eb;
+            color: #3b82f6;
             font-weight: 800;
         }
 
@@ -848,29 +848,28 @@
             width: 100%;
             table-layout: fixed;
             border-collapse: collapse;
-            font-size: 10px;
-            margin-bottom: 14px;
+            font-size: 9pt;
+            margin-bottom: 16px;
             box-sizing: border-box;
-            page-break-inside: avoid;
         }
 
         .pdf-table-print th {
             background: #1e293b;
             color: #ffffff;
             font-weight: 700;
-            padding: 7px 10px;
+            padding: 8px 12px;
             border: 1px solid #334155;
             text-align: left;
-            font-size: 9.5px;
+            font-size: 8pt;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.05em;
         }
 
         .pdf-table-print td {
-            padding: 8px 10px;
+            padding: 9px 12px;
             border: 1px solid #e2e8f0;
             color: #334155;
-            line-height: 1.45;
+            line-height: 1.5;
             word-break: break-word;
             vertical-align: top;
         }
@@ -882,41 +881,43 @@
         .pdf-list-print {
             list-style: none;
             padding-left: 0;
-            font-size: 10.5px;
-            line-height: 1.55;
+            font-size: 9.5pt;
+            line-height: 1.6;
+            margin: 0;
         }
 
         .pdf-list-print li {
-            padding: 7px 10px 7px 24px;
+            padding: 9px 12px 9px 28px;
             position: relative;
-            margin-bottom: 5px;
-            background: #f8fafc;
+            margin-bottom: 6px;
             border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            color: #334155;
+            color: #1e293b;
             word-break: break-word;
+            page-break-inside: avoid;
         }
 
         .pdf-list-print.findings-print li {
-            border-left: 3px solid #10b981;
+            border-left: 3px solid #059669;
+            background: #f0fdf4;
         }
 
         .pdf-list-print.findings-print li::before {
             content: "✓";
             position: absolute;
-            left: 8px;
+            left: 10px;
             color: #059669;
             font-weight: 800;
         }
 
         .pdf-list-print.actions-print li {
             border-left: 3px solid #4f46e5;
+            background: #f5f3ff;
         }
 
         .pdf-list-print.actions-print li::before {
             content: "→";
             position: absolute;
-            left: 8px;
+            left: 10px;
             color: #4f46e5;
             font-weight: 800;
         }
@@ -925,35 +926,117 @@
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin-top: 6px;
+            margin-top: 8px;
         }
 
         .pdf-entity-pill {
             background: #f1f5f9;
             border: 1px solid #cbd5e1;
             color: #0f172a;
-            padding: 3px 8px;
+            padding: 4px 10px;
             border-radius: 4px;
-            font-size: 9.5px;
+            font-size: 8.5pt;
             font-weight: 600;
         }
 
         .pdf-footer-clean {
-            margin-top: 24px;
-            border-top: 1px solid #cbd5e1;
-            padding-top: 8px;
+            margin-top: 28px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 10px;
             display: flex;
             justify-content: space-between;
-            font-size: 9px;
+            font-size: 8pt;
             color: #64748b;
+        }
+
+        /* ==========================================================================
+           @MEDIA PRINT — Native browser PDF rendering
+           ========================================================================== */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 16mm 18mm 16mm 18mm;
+            }
+
+            /* Kill the dark background completely */
+            html,
+            body {
+                background: #ffffff !important;
+                background-image: none !important;
+                background-color: #ffffff !important;
+                color: #0f172a !important;
+            }
+
+            /* Hide everything except the PDF document */
+            body>*:not(#pdf-render-wrapper) {
+                display: none !important;
+            }
+
+            footer {
+                display: none !important;
+            }
+
+            #pdf-render-wrapper {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                background: #ffffff !important;
+                min-height: 0 !important;
+            }
+
+            .pdf-memo-container {
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+            }
+
+            /* Force color printing */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            .pdf-memo-accent-bar {
+                background: linear-gradient(90deg, #1d4ed8 0%, #4f46e5 60%, #7c3aed 100%) !important;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .pdf-table-print th {
+                background: #1e293b !important;
+                color: #ffffff !important;
+            }
+
+            .pdf-list-print.findings-print li {
+                background: #f0fdf4 !important;
+            }
+
+            .pdf-list-print.actions-print li {
+                background: #f5f3ff !important;
+            }
+
+            .pdf-exec-paragraph {
+                background: #f0f7ff !important;
+            }
+
+            .pdf-topic-card-print {
+                background: #fafafa !important;
+                page-break-inside: avoid;
+            }
+
+            .pdf-heading-block {
+                page-break-after: avoid;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <!-- Main Workspace Container -->
     <main class="workspace-shell">
-        
+
         <!-- Header Title -->
         <div class="hero-lead">
             <h1 class="hero-lead-title">Web İçerik Analizi</h1>
@@ -963,16 +1046,16 @@
         <form id="intelligence-form">
             <div class="command-bar">
                 <div class="command-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path
+                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                        </path>
+                    </svg>
                 </div>
-                <input 
-                    type="url" 
-                    id="url-input" 
-                    class="url-input-field" 
-                    placeholder="Analiz edilecek sayfanın tam URL'sini girin (https://...)" 
-                    required 
-                    autocomplete="off"
-                >
+                <input type="url" id="url-input" class="url-input-field"
+                    placeholder="Analiz edilecek sayfanın tam URL'sini girin (https://...)" required autocomplete="off">
                 <button type="submit" id="submit-btn" class="btn-analyze">
                     <span>Analiz Başlat</span>
                 </button>
@@ -981,9 +1064,11 @@
 
         <div class="quick-presets-strip">
             <span>Örnek Bağlantılar:</span>
-            <span class="preset-tag" onclick="setUrl('https://openai.com/tr-TR/index/openai-api/')">OpenAI API Duyurusu</span>
+            <span class="preset-tag" onclick="setUrl('https://openai.com/tr-TR/index/openai-api/')">OpenAI API
+                Duyurusu</span>
             <span class="preset-tag" onclick="setUrl('https://news.ycombinator.com')">Hacker News</span>
-            <span class="preset-tag" onclick="setUrl('https://en.wikipedia.org/wiki/Artificial_intelligence')">Wikipedia AI</span>
+            <span class="preset-tag" onclick="setUrl('https://en.wikipedia.org/wiki/Artificial_intelligence')">Wikipedia
+                AI</span>
             <span class="preset-tag" onclick="setUrl('https://python.org')">Python.org</span>
         </div>
 
@@ -994,18 +1079,20 @@
         <div id="loading-view" class="loading-pane">
             <div class="progress-spinner"></div>
             <div class="loading-title-text">Sayfa Analiz Ediliyor</div>
-            <div class="loading-subtext">Firecrawl MCP saf metni kazıyor ve Gemini 3.7 Flash derinlemesine sentezliyor...</div>
+            <div class="loading-subtext">Firecrawl MCP saf metni kazıyor ve Gemini 3.7 Flash derinlemesine
+                sentezliyor...</div>
         </div>
 
         <!-- Empty State (Shown before any query) -->
         <div id="empty-state-view" class="empty-placeholder">
             <div class="empty-placeholder-title">Henüz Bir Analiz Başlatılmadı</div>
-            <div class="empty-placeholder-sub">Yukarıdaki alana dilediğiniz bir makale, dokümantasyon veya haber bağlantısını yapıştırarak tam teşekküllü istihbarat raporu oluşturun.</div>
+            <div class="empty-placeholder-sub">Yukarıdaki alana dilediğiniz bir makale, dokümantasyon veya haber
+                bağlantısını yapıştırarak tam teşekküllü istihbarat raporu oluşturun.</div>
         </div>
 
         <!-- Main Results Canvas -->
         <div id="results-canvas" class="results-canvas">
-            
+
             <!-- Canvas Header & Toolbar -->
             <div class="canvas-header-card">
                 <div class="target-source-block">
@@ -1015,15 +1102,30 @@
 
                 <div class="export-actions-row">
                     <button type="button" class="btn-export-pdf" id="btn-pdf-export" onclick="generatePdfReport()">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
                         <span>PDF Raporu İndir</span>
                     </button>
                     <button type="button" class="btn-export-secondary" onclick="copyMarkdownOutput()">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
                         <span>Markdown</span>
                     </button>
                     <button type="button" class="btn-export-secondary" onclick="copyJsonOutput()">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"></polyline>
+                            <polyline points="8 6 2 12 8 18"></polyline>
+                        </svg>
                         <span>JSON</span>
                     </button>
                 </div>
@@ -1166,7 +1268,7 @@
     <div id="pdf-render-wrapper">
         <div id="pdf-document" class="pdf-memo-container">
             <div class="pdf-memo-accent-bar"></div>
-            
+
             <div class="pdf-memo-header">
                 <div>
                     <div class="pdf-memo-title">WEB İÇERİK ANALİZ VE İSTİHBARAT RAPORU</div>
@@ -1225,7 +1327,8 @@
 
     <!-- Footer -->
     <footer>
-        <p>Web İçerik Analizi • Geliştirici: <a href="https://www.yucelgumus.dev/" target="_blank" rel="noopener noreferrer">Yücel Gümüş</a></p>
+        <p>Web İçerik Analizi • Geliştirici: <a href="https://www.yucelgumus.dev/" target="_blank"
+                rel="noopener noreferrer">Yücel Gümüş</a></p>
     </footer>
 
     <script>
@@ -1377,41 +1480,20 @@
             let domain = 'analiz_raporu';
             try {
                 domain = new URL(currentUrl).hostname.replace('www.', '');
-            } catch(e) {}
+            } catch (e) { }
             const fileName = `Rapor_${domain}_${now.toISOString().slice(0, 10)}.pdf`;
 
-            const element = document.getElementById('pdf-document');
-            const opt = {
-                margin: [8, 8, 8, 8],
-                filename: fileName,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true,
-                    letterRendering: true,
-                    scrollX: 0,
-                    scrollY: 0,
-                    width: 794,
-                    windowWidth: 794
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            html2pdf().set(opt).from(element).save().then(() => {
-                showToast('PDF raporu başarıyla indirildi.');
+            // Use native browser print for clean, full-width PDF output
+            setTimeout(() => {
+                window.print();
+                showToast('PDF olarak kaydetmek için "Farklı Kaydet" seçin.');
                 pdfBtn.innerHTML = originalText;
                 pdfBtn.disabled = false;
-            }).catch(err => {
-                console.error(err);
-                showToast('PDF oluşturulurken hata: ' + err.message);
-                pdfBtn.innerHTML = originalText;
-                pdfBtn.disabled = false;
-            });
+            }, 200);
         }
 
         // --- Form Submit & Orchestration ---
-        document.getElementById('intelligence-form').addEventListener('submit', async function(e) {
+        document.getElementById('intelligence-form').addEventListener('submit', async function (e) {
             e.preventDefault();
             const urlInput = document.getElementById('url-input');
             const submitBtn = document.getElementById('submit-btn');
@@ -1560,4 +1642,5 @@
         });
     </script>
 </body>
+
 </html>
