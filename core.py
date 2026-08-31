@@ -1,8 +1,11 @@
 """
-Core Module: Firecrawl MCP + Google Gemini + LangGraph State Pipeline
+Core Module: Firecrawl Python SDK + Google Gemini + LangGraph State Pipeline
 Gelişmiş & Kapsamlı AI İstihbarat ve Web Analiz Motoru.
 Web sayfasını derinlemesine analiz eder; yönetici özeti, detaylı konu kırılımları,
 bağlamsal istatistikler, aksiyon maddeleri ve bahsedilen teknolojileri çıkarır.
+
+NOT: MCP/npx yerine Firecrawl Python SDK kullanılmaktadır.
+     Node.js/npx gerektirmez — Cloud Run uyumlu.
 """
 
 import os
@@ -10,7 +13,6 @@ import sys
 import time
 import json
 import asyncio
-import subprocess
 from datetime import datetime
 from typing import Dict, Any, List, Optional, TypedDict
 
@@ -18,7 +20,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
-from langchain_mcp_adapters.tools import load_mcp_tools
+from firecrawl import FirecrawlApp
 from langgraph.graph import StateGraph, START, END
 
 # Ortam değişkenlerini yükle
@@ -80,62 +82,39 @@ class PipelineState(TypedDict, total=False):
     error: Optional[str]
 
 
-# --- 2. Yardımcı Fonksiyonlar & Temizleme ---
-
-def check_npx_available() -> bool:
-    """Sistemde npx komutunun bulunup bulunmadığını kontrol eder."""
-    try:
-        subprocess.run(["npx", "--version"], check=True, capture_output=True)
-        return True
-    except (subprocess.SubprocessError, FileNotFoundError):
-        return False
-
+# --- 2. Yardımcı Fonksiyonlar ---
 
 def validate_environment() -> None:
-    """Gerekli API anahtarlarını ve sistem gereksinimlerini doğrular."""
+    """Gerekli API anahtarlarını doğrular."""
     if not os.getenv("GEMINI_API_KEY"):
         raise ValueError("Hata: GEMINI_API_KEY ortam değişkeni ayarlanmamış. Lütfen .env dosyanızı kontrol edin.")
     if not os.getenv("FIRECRAWL_API_KEY"):
         raise ValueError("Hata: FIRECRAWL_API_KEY ortam değişkeni ayarlanmamış. Lütfen .env dosyanızı kontrol edin.")
-    if not check_npx_available():
-        print("Uyarı: 'npx' komutu bulunamadı. Firecrawl MCP için Node.js ve npx yüklü olmalıdır.", file=sys.stderr)
 
 
-def extract_clean_markdown(raw_content: str) -> str:
-    """Firecrawl MCP çıktısından saf Markdown metnini ayıklar."""
-    if not raw_content:
-        return ""
-    try:
-        parsed = json.loads(raw_content)
-        if isinstance(parsed, list) and len(parsed) > 0:
-            first_item = parsed[0]
-            if isinstance(first_item, dict) and "text" in first_item:
-                inner_json = json.loads(first_item["text"])
-                if isinstance(inner_json, dict) and "markdown" in inner_json:
-                    return inner_json["markdown"]
-        elif isinstance(parsed, dict) and "markdown" in parsed:
-            return parsed["markdown"]
-    except Exception:
-        pass
-    return raw_content
+# --- 3. Firecrawl Python SDK ile Kazıma ---
+
+async def scrape_url_with_sdk(url: str) -> str:
+    """
+    Firecrawl Python SDK kullanarak URL'yi kazır ve Markdown döndürür.
+    Node.js / npx gerektirmez.
+    """
+    def _scrape() -> str:
+        app = FirecrawlApp(api_key=os.getenv("FIRECRAWL_API_KEY", ""))
+        result = app.scrape_url(url, formats=["markdown"])
+        # SDK ScrapeResponse nesnesi — markdown alanını al
+        if hasattr(result, "markdown") and result.markdown:
+            return result.markdown
+        # Fallback: dict ise
+        if isinstance(result, dict):
+            return result.get("markdown") or result.get("content") or ""
+        return str(result)
+
+    # Bloklayan I/O'yu thread pool'da çalıştır
+    return await asyncio.to_thread(_scrape)
 
 
-# --- 3. MCP ve LLM İstemcileri ---
-
-async def get_firecrawl_scrape_tool():
-    """Firecrawl MCP aracını stdio transport üzerinden başlatır."""
-    connection = {
-        "transport": "stdio",
-        "command": "npx",
-        "args": ["firecrawl-mcp"],
-        "env": {"FIRECRAWL_API_KEY": os.getenv("FIRECRAWL_API_KEY", "")},
-    }
-    tools = await load_mcp_tools(None, connection=connection)
-    scrape_tool = next((t for t in tools if t.name == "firecrawl_scrape"), None)
-    if not scrape_tool:
-        raise RuntimeError("Hata: 'firecrawl_scrape' MCP aracı yüklenemedi. Firecrawl API anahtarınızı kontrol edin.")
-    return scrape_tool
-
+# --- 4. LLM: Google Gemini ile Yapılandırılmış Analiz ---
 
 def extract_structured_summary(
     content: str,
@@ -143,9 +122,8 @@ def extract_structured_summary(
     preferred_model: str = "gemini-3.7-flash"
 ) -> WebSummary:
     """
-    Google Gemini ile derinlemesine ve kapsamlı analiz yapar.
-    10 saniyelik deadline ile birincil modeli dener; 503/gecikme durumunda
-    anında optimize edilmiş yedek modellere geçerek yanıt üretir.
+    Google Gemini Chat API ile derinlemesine ve kapsamlı analiz yapar.
+    Birincil modelde hata olursa yedek modellere geçer.
     """
     api_key = os.getenv("GEMINI_API_KEY")
     client = genai.Client(
@@ -205,10 +183,11 @@ Lütfen yüzeysel veya kısa maddeler yerine, okuyucuya tam kapsamlı istihbarat
     raise RuntimeError(f"Tüm modeller denendi fakat yanıt alınamadı. Son hata: {last_err}")
 
 
-# --- 4. LangGraph İş Akışı (StateGraph) ---
+# --- 5. LangGraph İş Akışı (StateGraph) ---
 
-def create_summarizer_graph(scrape_tool):
-    """LangGraph StateGraph iş akışını oluşturur."""
+def create_summarizer_graph():
+    """LangGraph StateGraph iş akışını oluşturur (MCP tool bağımlılığı yok)."""
+
     async def scrape_node(state: PipelineState) -> PipelineState:
         url = state["url"]
         durations = state.get("durations", {})
@@ -216,9 +195,7 @@ def create_summarizer_graph(scrape_tool):
 
         scrape_start = time.time()
         try:
-            scrape_result = await scrape_tool.ainvoke({"url": url})
-            raw_text = scrape_result.content if hasattr(scrape_result, "content") else str(scrape_result)
-            clean_md = extract_clean_markdown(raw_text)
+            clean_md = await scrape_url_with_sdk(url)
         except Exception as exc:
             return {
                 "raw_content": "",
@@ -286,7 +263,7 @@ def create_summarizer_graph(scrape_tool):
     return workflow.compile()
 
 
-# --- 5. Üst Düzey Pipeline Runner ---
+# --- 6. Üst Düzey Pipeline Runner ---
 
 async def run_pipeline(
     url: str,
@@ -308,11 +285,8 @@ async def run_pipeline(
     }
 
     try:
-        tool_init_start = time.time()
-        scrape_tool = await get_firecrawl_scrape_tool()
-        benchmark_data["durations"]["tools_load_seconds"] = round(time.time() - tool_init_start, 3)
-
-        graph = create_summarizer_graph(scrape_tool)
+        # Graph'ı oluştur (artık tool init adımı yok)
+        graph = create_summarizer_graph()
 
         initial_state: PipelineState = {
             "url": url,
@@ -325,7 +299,7 @@ async def run_pipeline(
 
         final_state = await asyncio.wait_for(
             graph.ainvoke(initial_state),
-            timeout=90.0
+            timeout=120.0
         )
 
         benchmark_data["durations"] = final_state.get("durations", benchmark_data["durations"])

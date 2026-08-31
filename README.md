@@ -1,6 +1,6 @@
-# 🕷️ Firecrawl MCP + Gemini 3.7 Flash + LangGraph Web Intelligence Agent
+# 🕷️ Firecrawl + Gemini 3.7 Flash + LangGraph Web Intelligence Agent
 
-**Firecrawl MCP**, **Google Gemini 3.7 Flash** ve **LangGraph StateGraph** mimarisini bir araya getiren yeni nesil yapay zeka destekli web istihbarat, içerik kazıma ve derinlemesine analiz platformu.
+**Firecrawl Python SDK**, **Google Gemini 3.7 Flash** ve **LangGraph StateGraph** mimarisini bir araya getiren yeni nesil yapay zeka destekli web istihbarat, içerik kazıma ve derinlemesine analiz platformu.
 
 Bu proje; web sayfalarını karmaşık HTML/DOM etiketlerinden ve reklam gürültüsünden arındırarak saf Markdown formatında çeker, ardından **LangGraph** durumu üzerinde **Google Gemini 3.7 Flash** ile yapılandırılmış kurumsal analiz raporlarına (Yönetici Özeti, Tematik Konular, İstatistik Tablosu, Stratejik Bulgular, Eylem Planı, Tespit Edilen Şirket/Teknoloji Matrisi) dönüştürür.
 
@@ -8,8 +8,8 @@ Bu proje; web sayfalarını karmaşık HTML/DOM etiketlerinden ve reklam gürül
 
 ## 🌟 Temel Özellikler
 
-- **⚡ Tek Adımlı Akıllı Kazıma (Single-Pass Scraping):** Firecrawl MCP stdio protokolü ile entegre edilerek çift istek (double scraping) maliyeti ve gecikmesi ortadan kaldırılmıştır.
-- **🧠 Google Gemini 3.7 Flash & Akıllı Yedekleme (Fallback):** Birincil model olarak en güncel `gemini-3.7-flash` kullanılır. 10 saniyelik deadline süresiyle olası 503/gecikme durumlarında sistem duraksamadan anında optimize edilmiş yedek modellere (`gemini-flash-lite-latest` / `gemini-3.5-flash-lite`) geçer.
+- **⚡ Tek Adımlı Akıllı Kazıma (Single-Pass Scraping):** Firecrawl Python SDK ile entegre edilerek Node.js/npx bağımlılığı tamamen ortadan kaldırılmıştır. Saf Python mimarisi.
+- **🧠 Google Gemini 3.7 Flash & Akıllı Yedekleme (Fallback):** Birincil model olarak `gemini-3.7-flash` kullanılır. Hata durumunda `gemini-3.5-flash` ve `gemini-3.5-flash-lite` yedek modellerine otomatik geçiş yapılır.
 - **🔄 LangGraph StateGraph Pipeline:** `scrape_node` ve `summarize_node` düğümleri arasında Pydantic şeması ile tip güvenli ve izlenebilir durum yönetimi.
 - **📊 Kapsamlı İstihbarat Şeması:**
   - **Yönetici Özeti (Executive Summary):** 2-3 paragraflık derinlemesine genel bakış.
@@ -17,9 +17,10 @@ Bu proje; web sayfalarını karmaşık HTML/DOM etiketlerinden ve reklam gürül
   - **Doğrulanmış İstatistik ve Veri Tablosu:** Metrik, Sayısal Değer ve Bağlam sütunları.
   - **Stratejik Bulgular ve Aksiyon Planı:** Somut çıkarımlar ve uygulanabilir öneriler.
   - **Varlık & Teknoloji Matrisi:** Bahsedilen modeller, kurumlar, protokoller ve kişiler.
-- **🗂️ Sekmeli Çalışma Alanı (Tabbed Workspace Web UI):** FastAPI & Jinja2 tabanlı, gereksiz süslemelerden arındırılmış, modern ve odaklı araştırma arayüzü.
-- **📄 Vektörel Kurumsal PDF Raporu:** `html2pdf.js` ile tek tıkla resmi, antetli ve temiz A4 formatında PDF rapor indirme imkânı.
-- **💻 CLI & Benchmark Desteği:** Komut satırından `--benchmark` bayrağı ile anlık süre dağılımı (MCP, Kazıma, LLM süresi) ve içerik boyutu metrikleri.
+- **🗂️ Sekmeli Çalışma Alanı (Tabbed Workspace Web UI):** FastAPI & Jinja2 tabanlı modern araştırma arayüzü.
+- **📄 Tarayıcı Native PDF Raporu:** Tek tıkla tarayıcının yerleşik print motoru üzerinden resmi, antetli ve temiz A4 PDF rapor indirme.
+- **☁️ Cloud Run Hazır:** Dockerfile ile tek komutla Google Cloud Run'a deploy edilebilir.
+- **💻 CLI & Benchmark Desteği:** `--benchmark` bayrağı ile süre dağılımı ve içerik metrikleri.
 
 ---
 
@@ -39,9 +40,9 @@ Bu proje; web sayfalarını karmaşık HTML/DOM etiketlerinden ve reklam gürül
                 ▼                                             ▼
      ┌─────────────────────┐                       ┌─────────────────────┐
      │     Scrape Node     │                       │   Summarize Node    │
-     │  (Firecrawl MCP)    │                       │  (Gemini 3.7 Flash) │
-     │  Saf Markdown Çekimi│ ────── State ───────► │  Yapılandırılmış    │
-     │  & JSON Temizleme   │                       │  Pydantic Çıkarımı  │
+     │  (Firecrawl Python  │                       │  (Gemini 3.7 Flash) │
+     │   SDK — npx yok!)   │ ────── State ───────► │  Yapılandırılmış    │
+     │  Saf Markdown Çekimi│                       │  Pydantic Çıkarımı  │
      └─────────────────────┘                       └──────────┬──────────┘
                                                               │
                                        ┌──────────────────────┴──────────────────────┐
@@ -61,7 +62,8 @@ Projeyi çalıştırmak için aşağıdaki iki API anahtarı gereklidir:
 
 1. **Google Gemini API Key:** [Google AI Studio](https://aistudio.google.com/) üzerinden ücretsiz temin edilebilir.
 2. **Firecrawl API Key:** [Firecrawl.dev](https://www.firecrawl.dev/) üzerinden ücretsiz temin edilebilir.
-3. **Node.js & npx:** Firecrawl MCP aracını arka planda çalıştırmak için sisteminizde Node.js (v18+) kurulu olmalıdır.
+
+> **Not:** Node.js veya npx kurulumu **gerekmemektedir.** Firecrawl artık Python SDK üzerinden çalışmaktadır.
 
 ---
 
@@ -122,14 +124,43 @@ python main.py https://openai.com/tr-TR/index/openai-api/ --model gemini-3.7-fla
 
 ---
 
+## ☁️ Google Cloud Run'a Deploy
+
+Dockerfile hazır — tek komutla deploy edin:
+
+```bash
+# 1. gcloud login ve proje seç
+gcloud auth login
+gcloud config set project PROJE_ID
+
+# 2. API'leri etkinleştir
+gcloud services enable run.googleapis.com cloudbuild.googleapis.com
+
+# 3. Build + Deploy (tek komut)
+gcloud run deploy firecrawl-analyzer \
+  --source . \
+  --region europe-west1 \
+  --platform managed \
+  --allow-unauthenticated \
+  --memory 1Gi \
+  --timeout 300 \
+  --set-env-vars "GEMINI_API_KEY=...,FIRECRAWL_API_KEY=..."
+```
+
+> Node.js gerektirmediği için Docker image yaklaşık **~150MB** boyutundadır.
+
+---
+
 ## 📁 Proje Dosya Yapısı
 
 ```
 Firecrawl_MCP-Gemini-LangGraph/
 ├── app.py                   # FastAPI web sunucusu ve API uç noktaları
-├── core.py                  # LangGraph StateGraph, MCP ve Gemini analiz çekirdeği
+├── core.py                  # LangGraph StateGraph, Firecrawl SDK ve Gemini analiz çekirdeği
 ├── main.py                  # CLI runner ve benchmark terminal raporlayıcısı
-├── requirements.txt         # Sadeleştirilmiş ve test edilmiş bağımlılıklar listesi
+├── requirements.txt         # Python bağımlılıkları (Node.js yok)
+├── Dockerfile               # Cloud Run hazır container tanımı
+├── .dockerignore            # Docker build optimizasyonu
 ├── templates/
 │   └── index.html           # Sekmeli araştırma paneli ve kurumsal A4 PDF şablonu
 ├── .env.example             # Çevre değişkenleri şablonu
@@ -143,6 +174,7 @@ Firecrawl_MCP-Gemini-LangGraph/
 
 * `.env` dosyası ve tüm API anahtarları `.gitignore` kapsamındadır ve depoya dahil edilmez.
 * Girdi URL'leri ve Pydantic şema doğrulamaları tip güvenliği standartlarına uygundur.
+* Cloud Run deploy'da API anahtarları `--set-env-vars` veya Secret Manager üzerinden yönetilmelidir.
 
 ---
 
