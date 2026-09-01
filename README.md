@@ -2,6 +2,8 @@
 
 **Firecrawl Python SDK**, **Google Gemini 3.7 Flash** ve **LangGraph StateGraph** mimarisini bir araya getiren yeni nesil yapay zeka destekli web istihbarat, içerik kazıma ve derinlemesine analiz platformu.
 
+> 🚀 **Canlı Uygulama / Demo:** [https://firecrawl-mcp.web.app](https://firecrawl-mcp.web.app)
+
 Bu proje; web sayfalarını karmaşık HTML/DOM etiketlerinden ve reklam gürültüsünden arındırarak saf Markdown formatında çeker, ardından **LangGraph** durumu üzerinde **Google Gemini 3.7 Flash** ile yapılandırılmış kurumsal analiz raporlarına (Yönetici Özeti, Tematik Konular, İstatistik Tablosu, Stratejik Bulgular, Eylem Planı, Tespit Edilen Şirket/Teknoloji Matrisi) dönüştürür.
 
 ---
