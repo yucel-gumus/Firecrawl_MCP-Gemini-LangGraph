@@ -1,16 +1,27 @@
 #!/bin/bash
-# Google Cloud Run Deployment Script
-# Bu script, maliyet optimizasyonu ve Gunicorn yapılandırması ile projeyi deploy eder.
+# Google Cloud Run Deployment Script - AUTO DEPLOY
+# Bu script API keyleri gizlice okur ve Cloud Run'a atar.
 
-echo "🚀 Firecrawl & Gemini LangGraph Web Summarizer - Cloud Run Deploy"
+echo "🚀 Firecrawl & Gemini LangGraph Web Summarizer - Secure Cloud Run Deploy"
 
 SERVICE_NAME="firecrawl-ai-summarizer"
 REGION="europe-west4"
 
 echo "Servis Adı: $SERVICE_NAME"
 echo "Bölge: $REGION"
+echo "Güvenlik: API keyler .env'den alınıyor..."
+
+# .env dosyasından okuma (başında # olmayan satırları export eder)
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+else
+  echo "HATA: .env dosyası bulunamadı. Lütfen API keyleri kontrol edin."
+  exit 1
+fi
+
 echo "Deployment başlıyor. (Maksimum 2 instances, Minimum 0 instances, CPU Allocation aktif)"
 
+# Secret değişkenleri terminale yazdırmadan (--quiet vb) çalıştırıyoruz.
 gcloud run deploy $SERVICE_NAME \
   --source . \
   --region $REGION \
@@ -20,15 +31,6 @@ gcloud run deploy $SERVICE_NAME \
   --min-instances 0 \
   --max-instances 2 \
   --timeout 180s \
-  --update-env-vars="PORT=8080"
+  --set-env-vars="GEMINI_API_KEY=${GEMINI_API_KEY},FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}"
 
-echo "✅ Deploy komutu tamamlandı."
-echo ""
-echo "⚠️  LÜTFEN DİKKAT: Uygulamanın çalışması için API anahtarlarınızı eklemeniz gerekiyor."
-echo "Güvenliğiniz için terminalde düz metin (plain-text) yazmak istemezseniz, Google Cloud Console'dan ekleyebilirsiniz:"
-echo "1. Cloud Console'a gidin -> Cloud Run -> $SERVICE_NAME"
-echo "2. Edit & Deploy New Revision (Yeni Sürüm Düzenle) butonuna tıklayın."
-echo "3. Variables & Secrets sekmesinde GEMINI_API_KEY ve FIRECRAWL_API_KEY değişkenlerini ekleyin ve deploy edin."
-echo ""
-echo "Veya gcloud CLI üzerinden şu komutla hemen ekleyebilirsiniz:"
-echo "gcloud run services update $SERVICE_NAME --region=$REGION --update-env-vars=\"GEMINI_API_KEY=sizin_anahtar,FIRECRAWL_API_KEY=sizin_anahtar\""
+echo "✅ Canlı Deploy komutu tamamlandı."
