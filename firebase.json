@@ -1,0 +1,20 @@
+{
+  "hosting": {
+    "site": "firecrawl-mcp",
+    "public": "static",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "firecrawl-ai-summarizer",
+          "region": "europe-west4"
+        }
+      }
+    ]
+  }
+}
