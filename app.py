@@ -4,17 +4,18 @@ Modern web arayüzü ve REST API sunucusu.
 """
 
 import os
-import json
 import uvicorn
 from contextlib import asynccontextmanager
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, HttpUrl
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 
 from core import run_pipeline, validate_environment
-from config import DEFAULT_MODEL
+from config import DEFAULT_MODEL, ALLOWED_MODELS, DEFAULT_PORT
+from fastapi.middleware.cors import CORSMiddleware
 
 
 # --- Uygulama Yaşam Döngüsü ---
@@ -34,14 +35,26 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# CORS Middleware Ekle
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # HTML Şablonları dizini
 templates = Jinja2Templates(directory="templates")
+
+# Statik dosyaları servis et (CSS, JS)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 # --- Pydantic İstek ve Yanıt Modelleri ---
 
 class SummarizeRequest(BaseModel):
-    url: str = Field(..., description="Kazınacak ve özetlenecek tam web sayfası URL'si")
+    url: HttpUrl = Field(..., description="Kazınacak ve özetlenecek tam web sayfası URL'si")
     model: Optional[str] = Field(
         default=None,
         description=f"Kullanılacak Gemini modeli (boş bırakılırsa varsayılan: {DEFAULT_MODEL})"
@@ -62,14 +75,19 @@ async def summarize_endpoint(req: SummarizeRequest):
     Gönderilen URL'yi LangGraph + Firecrawl SDK + Gemini hattında işler
     ve yapılandırılmış özet + performans metriklerini döndürür.
     """
-    url_str = req.url.strip()
-    if not url_str.startswith("http://") and not url_str.startswith("https://"):
-        raise HTTPException(status_code=400, detail="Geçerli bir URL girmelisiniz (http:// veya https:// ile başlamalıdır).")
+    url_str = str(req.url)
+    model_name = req.model or DEFAULT_MODEL
+
+    if model_name not in ALLOWED_MODELS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Geçersiz model: '{model_name}'. İzin verilen modeller: {', '.join(ALLOWED_MODELS)}"
+        )
 
     try:
         result = await run_pipeline(
             url=url_str,
-            model_name=req.model or DEFAULT_MODEL
+            model_name=model_name
         )
         return JSONResponse(content=result)
     except Exception as e:
@@ -84,24 +102,9 @@ async def summarize_endpoint(req: SummarizeRequest):
         )
 
 
-@app.get("/api/benchmark-history", response_class=JSONResponse)
-async def get_benchmark_history():
-    """benchmark_results.json dosyasındaki geçmiş performans kayıtlarını döner."""
-    benchmark_file = "benchmark_results.json"
-    if os.path.exists(benchmark_file):
-        try:
-            with open(benchmark_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if isinstance(data, list):
-                    return JSONResponse(content=data[-20:])  # Son 20 kayıt
-                return JSONResponse(content=[data])
-        except Exception:
-            return JSONResponse(content=[])
-    return JSONResponse(content=[])
-
-
 # --- Sunucuyu Başlatma ---
 
 if __name__ == "__main__":
-    print("🌐 FastAPI Sunucusu Başlatılıyor: http://127.0.0.1:8000")
-    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
+    port = int(os.getenv("PORT", DEFAULT_PORT))
+    print(f"🌐 FastAPI Sunucusu Başlatılıyor: http://127.0.0.1:{port}")
+    uvicorn.run("app:app", host="127.0.0.1", port=port, reload=True)

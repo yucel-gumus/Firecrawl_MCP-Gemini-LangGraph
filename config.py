@@ -18,6 +18,9 @@ FALLBACK_MODELS = [
     "gemini-3.5-flash-lite",
 ]
 
+# İzin verilen modellerin tam listesi (Güvenlik kontrolü için)
+ALLOWED_MODELS = [DEFAULT_MODEL] + FALLBACK_MODELS
+
 # ──────────────────────────────────────────────
 # Zaman Aşımı Ayarları
 # ──────────────────────────────────────────────
@@ -27,3 +30,9 @@ LLM_TIMEOUT_MS = 120_000  # 120 saniye
 
 # LangGraph pipeline toplam timeout (saniye)
 PIPELINE_TIMEOUT_S = 120.0
+
+# ──────────────────────────────────────────────
+# Sunucu Ayarları
+# ──────────────────────────────────────────────
+
+DEFAULT_PORT = 8000

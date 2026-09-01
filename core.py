@@ -161,7 +161,7 @@ Sana verilen web sayfası içeriğini derinlemesine, ayrıntılı ve hiçbir kri
 KAYNAK URL: {url}
 ---
 KAZINAN WEB İÇERİĞİ:
-{content[:45000]}
+{content[:2000000]}
 ---
 
 GÖREV TALİMATLARI:
@@ -294,6 +294,9 @@ def create_summarizer_graph():
     return workflow.compile()
 
 
+# Global olarak bir kez derlenen LangGraph iş akışı
+_compiled_graph = create_summarizer_graph()
+
 # --- 7. Üst Düzey Pipeline Runner ---
 
 async def run_pipeline(
@@ -314,8 +317,6 @@ async def run_pipeline(
     }
 
     try:
-        graph = create_summarizer_graph()
-
         initial_state: PipelineState = {
             "url": url,
             "preferred_model": model_name,
@@ -326,7 +327,7 @@ async def run_pipeline(
         }
 
         final_state = await asyncio.wait_for(
-            graph.ainvoke(initial_state),
+            _compiled_graph.ainvoke(initial_state),
             timeout=PIPELINE_TIMEOUT_S
         )
 

@@ -20,5 +20,5 @@ COPY . .
 # Cloud Run PORT env değişkenini kullanır (varsayılan 8080)
 ENV PORT=8080
 
-# Uvicorn — production modu (reload yok, tek worker)
-CMD uvicorn app:app --host 0.0.0.0 --port $PORT --workers 1
+# Gunicorn ile Uvicorn Worker — Production kalitesinde, timeout toleranslı
+CMD exec gunicorn app:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 180
