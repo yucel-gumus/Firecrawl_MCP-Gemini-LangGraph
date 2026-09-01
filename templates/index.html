@@ -46,6 +46,11 @@
             --radius-xl: 22px;
         }
 
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -56,7 +61,8 @@
             font-family: var(--font-sans);
             background-color: var(--bg-page);
             color: var(--text-body);
-            min-height: 100vh;
+            height: 100%;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             line-height: 1.6;
@@ -76,6 +82,30 @@
             display: flex;
             flex-direction: column;
             gap: 2rem;
+            /* Sayfa scrollı yok: workspace kendi içinde scroll eder */
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* İnce, subtle custom scrollbar — tarayıcı chrome scrollbarının yerine */
+        .workspace-shell::-webkit-scrollbar {
+            width: 5px;
+        }
+        .workspace-shell::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .workspace-shell::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 99px;
+        }
+        .workspace-shell::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        /* Firefox */
+        .workspace-shell {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
         }
 
         /* --- Title Header --- */
@@ -377,7 +407,7 @@
             gap: 6px;
             border-bottom: 1px solid var(--border-subtle);
             padding-bottom: 2px;
-            overflow-x: auto;
+            flex-wrap: wrap;
         }
 
         .tab-btn {
@@ -1079,7 +1109,7 @@
         <div id="loading-view" class="loading-pane">
             <div class="progress-spinner"></div>
             <div class="loading-title-text">Sayfa Analiz Ediliyor</div>
-            <div class="loading-subtext">Firecrawl MCP saf metni kazıyor ve Gemini 3.7 Flash derinlemesine
+            <div class="loading-subtext">Firecrawl SDK saf metni kazıyor ve Gemini 3.6 Flash derinlemesine
                 sentezliyor...</div>
         </div>
 
@@ -1272,7 +1302,7 @@
             <div class="pdf-memo-header">
                 <div>
                     <div class="pdf-memo-title">WEB İÇERİK ANALİZ VE İSTİHBARAT RAPORU</div>
-                    <div class="pdf-memo-sub">Motor: Firecrawl MCP • Analiz Modeli: Google Gemini 3.7 Flash</div>
+                    <div class="pdf-memo-sub">Motor: Firecrawl SDK • Analiz Modeli: Google Gemini 3.6 Flash</div>
                 </div>
                 <div class="pdf-meta-col">
                     <div class="pdf-report-pill">RAPOR NO: <span id="pdf-report-id">001</span></div>
@@ -1319,7 +1349,7 @@
             <div class="pdf-entities-grid" id="pdf-entities-container"></div>
 
             <div class="pdf-footer-clean">
-                <span>Web İçerik Analizi • Firecrawl MCP & Gemini LangGraph Agent</span>
+                <span>Web İçerik Analizi • Firecrawl SDK & Gemini LangGraph Agent</span>
                 <span>Geliştirici: Yücel Gümüş (yucelgumus.dev)</span>
             </div>
         </div>
