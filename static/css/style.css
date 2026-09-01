@@ -308,8 +308,8 @@
         }
 
         .btn-export-pdf {
-            background: var(--text-title);
-            color: #0f172a;
+            background: #ffffff;
+            color: #111827;
             border: none;
             padding: 8px 16px;
             border-radius: var(--radius-md);
@@ -714,8 +714,8 @@
         }
 
         .pdf-memo-container {
-            background: var(--text-title);
-            color: #0f172a;
+            background: #ffffff;
+            color: #111827;
             font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
             line-height: 1.6;
             word-wrap: break-word;
@@ -724,7 +724,7 @@
 
         .pdf-memo-accent-bar {
             height: 5px;
-            background: linear-gradient(90deg, #1d4ed8 0%, #4f46e5 60%, #7c3aed 100%);
+            background: var(--brand-primary);
             margin-bottom: 20px;
         }
 
@@ -740,7 +740,7 @@
         .pdf-memo-title {
             font-size: 18pt;
             font-weight: 800;
-            color: #0f172a;
+            color: #111827;
             letter-spacing: -0.02em;
         }
 
@@ -759,9 +759,9 @@
 
         .pdf-report-pill {
             display: inline-block;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
+            background: var(--bg-page);
+            color: var(--bg-surface);
+            border: 1px solid var(--bg-surface);
             padding: 3px 9px;
             border-radius: 4px;
             font-weight: 700;
@@ -775,13 +775,13 @@
             border-collapse: collapse;
             font-size: 9pt;
             margin-bottom: 18px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-page);
+            border: 1px solid var(--bg-surface);
         }
 
         .pdf-meta-box-clean td {
             padding: 8px 12px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--bg-surface);
             word-break: break-all;
         }
 
@@ -790,8 +790,8 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: #1e40af;
-            border-bottom: 2px solid #3b82f6;
+            color: var(--bg-surface);
+            border-bottom: 2px solid var(--bg-surface);
             padding-bottom: 5px;
             margin-top: 22px;
             margin-bottom: 12px;
@@ -799,8 +799,8 @@
         }
 
         .pdf-exec-paragraph {
-            background: #f0f7ff;
-            border-left: 4px solid #2563eb;
+            background: var(--bg-page);
+            border-left: 4px solid var(--brand-primary);
             padding: 14px 18px;
             font-size: 10pt;
             line-height: 1.8;
@@ -811,8 +811,8 @@
         }
 
         .pdf-topic-card-print {
-            border: 1px solid #e2e8f0;
-            background: #fafafa;
+            border: 1px solid var(--bg-surface);
+            background: #ffffff;
             padding: 12px 16px;
             margin-bottom: 10px;
             box-sizing: border-box;
@@ -822,7 +822,7 @@
         .pdf-topic-name-print {
             font-size: 10.5pt;
             font-weight: 700;
-            color: #0f172a;
+            color: #111827;
             margin-bottom: 4px;
         }
 
@@ -839,7 +839,7 @@
             font-size: 9pt;
             color: #334155;
             line-height: 1.55;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid var(--bg-surface);
             padding-top: 6px;
             margin: 0;
         }
@@ -854,7 +854,7 @@
             content: "•";
             position: absolute;
             left: 0;
-            color: #3b82f6;
+            color: var(--bg-surface);
             font-weight: 800;
         }
 
@@ -881,7 +881,7 @@
 
         .pdf-table-print td {
             padding: 9px 12px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--bg-surface);
             color: #334155;
             line-height: 1.5;
             word-break: break-word;
@@ -889,7 +889,7 @@
         }
 
         .pdf-table-print tr:nth-child(even) td {
-            background: #f8fafc;
+            background: var(--bg-page);
         }
 
         .pdf-list-print {
@@ -904,35 +904,35 @@
             padding: 9px 12px 9px 28px;
             position: relative;
             margin-bottom: 6px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--bg-surface);
             color: #1e293b;
             word-break: break-word;
             page-break-inside: avoid;
         }
 
         .pdf-list-print.findings-print li {
-            border-left: 3px solid #059669;
-            background: #f0fdf4;
+            border-left: 3px solid var(--brand-primary);
+            background: var(--bg-page);
         }
 
         .pdf-list-print.findings-print li::before {
             content: "✓";
             position: absolute;
             left: 10px;
-            color: #059669;
+            color: var(--brand-primary);
             font-weight: 800;
         }
 
         .pdf-list-print.actions-print li {
-            border-left: 3px solid #4f46e5;
-            background: #f5f3ff;
+            border-left: 3px solid var(--bg-surface);
+            background: var(--bg-page);
         }
 
         .pdf-list-print.actions-print li::before {
             content: "→";
             position: absolute;
             left: 10px;
-            color: #4f46e5;
+            color: var(--bg-surface);
             font-weight: 800;
         }
 
@@ -944,9 +944,9 @@
         }
 
         .pdf-entity-pill {
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            color: #0f172a;
+            background: var(--bg-page);
+            border: 1px solid var(--bg-surface);
+            color: #111827;
             padding: 4px 10px;
             border-radius: 4px;
             font-size: 8.5pt;
@@ -955,7 +955,7 @@
 
         .pdf-footer-clean {
             margin-top: 28px;
-            border-top: 2px solid #e2e8f0;
+            border-top: 2px solid var(--bg-surface);
             padding-top: 10px;
             display: flex;
             justify-content: space-between;
@@ -977,9 +977,9 @@
             body {
                 height: auto !important;
                 overflow: visible !important;
-                background: var(--text-title) !important;
+                background: #ffffff !important;
                 background-image: none !important;
-                background-color: var(--text-title) !important;
+                background-color: #ffffff !important;
                 color: #0f172a !important;
             }
 
@@ -996,7 +996,7 @@
                 display: block !important;
                 position: static !important;
                 width: 100% !important;
-                background: var(--text-title) !important;
+                background: #ffffff !important;
                 min-height: 0 !important;
             }
 
@@ -1004,7 +1004,7 @@
                 width: 100% !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                background: var(--text-title) !important;
+                background: #ffffff !important;
             }
 
             /* Force color printing */
@@ -1015,7 +1015,7 @@
             }
 
             .pdf-memo-accent-bar {
-                background: linear-gradient(90deg, #1d4ed8 0%, #4f46e5 60%, #7c3aed 100%) !important;
+                background: linear-gradient(90deg, var(--bg-surface) 0%, var(--bg-surface) 60%, #7c3aed 100%) !important;
                 -webkit-print-color-adjust: exact;
             }
 
@@ -1025,19 +1025,19 @@
             }
 
             .pdf-list-print.findings-print li {
-                background: #f0fdf4 !important;
+                background: var(--bg-page) !important;
             }
 
             .pdf-list-print.actions-print li {
-                background: #f5f3ff !important;
+                background: var(--bg-page) !important;
             }
 
             .pdf-exec-paragraph {
-                background: #f0f7ff !important;
+                background: var(--bg-page) !important;
             }
 
             .pdf-topic-card-print {
-                background: #fafafa !important;
+                background: #ffffff !important;
                 page-break-inside: avoid;
             }
 
