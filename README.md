@@ -18,8 +18,8 @@ Bu proje; web sayfalarını karmaşık HTML/DOM etiketlerinden ve reklam gürül
   - **Stratejik Bulgular ve Aksiyon Planı:** Somut çıkarımlar ve uygulanabilir öneriler.
   - **Varlık & Teknoloji Matrisi:** Bahsedilen modeller, kurumlar, protokoller ve kişiler.
 - **🗂️ Sekmeli Çalışma Alanı (Tabbed Workspace Web UI):** FastAPI & Jinja2 tabanlı modern araştırma arayüzü.
-- **📄 Tarayıcı Native PDF Raporu:** Tek tıkla tarayıcının yerleşik print motoru üzerinden resmi, antetli ve temiz A4 PDF rapor indirme.
-- **☁️ Cloud Run Hazır:** Dockerfile ile tek komutla Google Cloud Run'a deploy edilebilir.
+- **📄 Tarayıcı Native PDF Raporu:** CSS overflow ve height optimizasyonları ile sayfa kesintisi yaşamadan kusursuz A4 PDF indirme.
+- **☁️ Cloud Run & Firebase Hosting:** `Gunicorn` entegrasyonu ile production-ready. Firebase Hosting (Rewrite) desteğiyle şık URL, $0 idle cost (`min-instances: 0`).
 - **💻 CLI & Benchmark Desteği:** `--benchmark` bayrağı ile süre dağılımı ve içerik metrikleri.
 
 ---
@@ -124,30 +124,25 @@ python main.py https://openai.com/tr-TR/index/openai-api/ --model gemini-3.7-fla
 
 ---
 
-## ☁️ Google Cloud Run'a Deploy
+## ☁️ Google Cloud Run & Firebase Hosting (Production)
 
-Dockerfile hazır — tek komutla deploy edin:
+Proje, production için **Gunicorn** ve **UvicornWorker** destekli Dockerfile barındırır.
+Mevcut yapılandırma ile Cloud Run uygulamanız `min-instances: 0` olarak ayağa kalkar, böylece trafik yokken 0$ maliyet yaratır.
+
+### Deploy İşlemi
+
+`.env` şifrelerinizi sızdırmamak ve güvenli deployment yapmak için `deploy.sh` dosyasını kullanın:
 
 ```bash
-# 1. gcloud login ve proje seç
-gcloud auth login
-gcloud config set project PROJE_ID
+# 1. Projeyi Güvenle Deploy Edin (Otomatik Cloud Run Deploy)
+chmod +x deploy.sh
+./deploy.sh
 
-# 2. API'leri etkinleştir
-gcloud services enable run.googleapis.com cloudbuild.googleapis.com
-
-# 3. Build + Deploy (tek komut)
-gcloud run deploy firecrawl-analyzer \
-  --source . \
-  --region europe-west1 \
-  --platform managed \
-  --allow-unauthenticated \
-  --memory 1Gi \
-  --timeout 300 \
-  --set-env-vars "GEMINI_API_KEY=...,FIRECRAWL_API_KEY=..."
+# 2. Firebase Hosting'e Bağlayın (Temiz URL için)
+npx -y firebase-tools@latest deploy --only hosting
 ```
 
-> Node.js gerektirmediği için Docker image yaklaşık **~150MB** boyutundadır.
+> **Nasıl Çalışır?** `firebase.json` içerisindeki `rewrites` kuralı, Firebase Hosting'e gelen trafiği bir köprü (proxy) mantığıyla arka plandaki Cloud Run sunucusuna iletir. Böylece `firecrawl-mcp.web.app` gibi çok daha profesyonel bir canlı URL elde edilir.
 
 ---
 
