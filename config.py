@@ -12,8 +12,8 @@ Model değiştirmek için SADECE bu dosyayı düzenleyin.
 DEFAULT_MODEL = "gemini-3.6-flash"
 
 # Fallback zinciri: birincil modelde hata alınırsa sırayla denenir
+# NOT: DEFAULT_MODEL zaten 1. sıraya ekleniyor — buraya yazılmamalı
 FALLBACK_MODELS = [
-    "gemini-3.6-flash",
     "gemini-3.5-flash",
     "gemini-3.5-flash-lite",
 ]

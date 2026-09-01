@@ -1,5 +1,5 @@
 """
-CLI Runner: Firecrawl MCP & Gemini LangGraph Summarizer
+CLI Runner: Firecrawl + Gemini LangGraph Summarizer
 Kapsamlı Web İstihbarat ve Analiz Terminal Arayüzü.
 """
 
@@ -14,7 +14,7 @@ from config import DEFAULT_MODEL
 def parse_arguments():
     """Komut satırı argümanlarını ayrıştırır."""
     parser = argparse.ArgumentParser(
-        description="🕷️ Firecrawl MCP & Gemini 3.7 Flash LangGraph AI Web Scraper & Intelligence Agent"
+        description=f"🕷️ Firecrawl & Gemini LangGraph AI Web Scraper & Intelligence Agent (Model: {DEFAULT_MODEL})"
     )
     parser.add_argument(
         "url",
@@ -118,7 +118,6 @@ def print_benchmark_report(result: dict):
 
     durations = result.get("durations", {})
     print("\n⏱️ SÜRE DAĞILIMI (Saniye):")
-    print(f"  • MCP Araç Yükleme    : {durations.get('tools_load_seconds', 0):.3f}s")
     print(f"  • Firecrawl Kazıma    : {durations.get('scraping_seconds', 0):.3f}s")
     print(f"  • Gemini Analiz Süresi: {durations.get('llm_processing_seconds', 0):.3f}s")
     print(f"  ---------------------------------")

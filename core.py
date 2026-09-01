@@ -86,14 +86,40 @@ class PipelineState(TypedDict, total=False):
 # --- 2. Yardımcı Fonksiyonlar ---
 
 def validate_environment() -> None:
-    """Gerekli API anahtarlarını doğrular."""
+    """Gerekli API anahtarlarını doğrular. Uygulama başlangıcında bir kez çağrılır."""
     if not os.getenv("GEMINI_API_KEY"):
         raise ValueError("Hata: GEMINI_API_KEY ortam değişkeni ayarlanmamış. Lütfen .env dosyanızı kontrol edin.")
     if not os.getenv("FIRECRAWL_API_KEY"):
         raise ValueError("Hata: FIRECRAWL_API_KEY ortam değişkeni ayarlanmamış. Lütfen .env dosyanızı kontrol edin.")
 
 
-# --- 3. Firecrawl Python SDK ile Kazıma ---
+# --- 3. Singleton API Client'ları ---
+# Her istek için yeni client oluşturmak yerine modül seviyesinde bir kez oluşturulur.
+
+_firecrawl_client: Optional[FirecrawlApp] = None
+_gemini_client: Optional[genai.Client] = None
+
+
+def get_firecrawl_client() -> FirecrawlApp:
+    """Firecrawl SDK client'ını singleton olarak döndürür."""
+    global _firecrawl_client
+    if _firecrawl_client is None:
+        _firecrawl_client = FirecrawlApp(api_key=os.getenv("FIRECRAWL_API_KEY", ""))
+    return _firecrawl_client
+
+
+def get_gemini_client() -> genai.Client:
+    """Gemini API client'ını singleton olarak döndürür."""
+    global _gemini_client
+    if _gemini_client is None:
+        _gemini_client = genai.Client(
+            api_key=os.getenv("GEMINI_API_KEY", ""),
+            http_options=types.HttpOptions(timeout=LLM_TIMEOUT_MS)
+        )
+    return _gemini_client
+
+
+# --- 4. Firecrawl Python SDK ile Kazıma ---
 
 async def scrape_url_with_sdk(url: str) -> str:
     """
@@ -101,8 +127,8 @@ async def scrape_url_with_sdk(url: str) -> str:
     Node.js / npx gerektirmez.
     """
     def _scrape() -> str:
-        app = FirecrawlApp(api_key=os.getenv("FIRECRAWL_API_KEY", ""))
-        result = app.scrape_url(url, formats=["markdown"])
+        client = get_firecrawl_client()
+        result = client.scrape_url(url, formats=["markdown"])
         # SDK ScrapeResponse nesnesi — markdown alanını al
         if hasattr(result, "markdown") and result.markdown:
             return result.markdown
@@ -115,7 +141,7 @@ async def scrape_url_with_sdk(url: str) -> str:
     return await asyncio.to_thread(_scrape)
 
 
-# --- 4. LLM: Google Gemini ile Yapılandırılmış Analiz ---
+# --- 5. LLM: Google Gemini ile Yapılandırılmış Analiz ---
 
 def extract_structured_summary(
     content: str,
@@ -126,11 +152,7 @@ def extract_structured_summary(
     Google Gemini Chat API ile derinlemesine ve kapsamlı analiz yapar.
     Birincil modelde hata olursa yedek modellere geçer.
     """
-    api_key = os.getenv("GEMINI_API_KEY")
-    client = genai.Client(
-        api_key=api_key,
-        http_options=types.HttpOptions(timeout=LLM_TIMEOUT_MS)
-    )
+    client = get_gemini_client()
 
     prompt = f"""
 Sen dünya standartlarında kıdemli bir araştırma analisti, veri bilimci ve stratejistsin.
@@ -183,10 +205,10 @@ Lütfen yüzeysel veya kısa maddeler yerine, okuyucuya tam kapsamlı istihbarat
     raise RuntimeError(f"Tüm modeller denendi fakat yanıt alınamadı. Son hata: {last_err}")
 
 
-# --- 5. LangGraph İş Akışı (StateGraph) ---
+# --- 6. LangGraph İş Akışı (StateGraph) ---
 
 def create_summarizer_graph():
-    """LangGraph StateGraph iş akışını oluşturur (MCP tool bağımlılığı yok)."""
+    """LangGraph StateGraph iş akışını oluşturur."""
 
     async def scrape_node(state: PipelineState) -> PipelineState:
         url = state["url"]
@@ -204,6 +226,15 @@ def create_summarizer_graph():
             }
 
         durations["scraping_seconds"] = round(time.time() - scrape_start, 3)
+
+        # Scrape sonrası boşluk kontrolü — boş içerik erken yakalanır
+        if not clean_md or not clean_md.strip():
+            return {
+                "raw_content": "",
+                "error": "Sayfa kazıma başarılı ancak içerik boş döndü. Sayfa dinamik (JS-render) olabilir.",
+                "success": False,
+            }
+
         content_stats["scraped_content_length"] = len(clean_md)
 
         return {
@@ -263,15 +294,13 @@ def create_summarizer_graph():
     return workflow.compile()
 
 
-# --- 6. Üst Düzey Pipeline Runner ---
+# --- 7. Üst Düzey Pipeline Runner ---
 
 async def run_pipeline(
     url: str,
-    save_files: bool = True,
     model_name: str = DEFAULT_MODEL
 ) -> Dict[str, Any]:
     """Tam analiz iş akışını çalıştırır."""
-    validate_environment()
     total_start_time = time.time()
 
     benchmark_data: Dict[str, Any] = {
@@ -285,7 +314,6 @@ async def run_pipeline(
     }
 
     try:
-        # Graph'ı oluştur (artık tool init adımı yok)
         graph = create_summarizer_graph()
 
         initial_state: PipelineState = {

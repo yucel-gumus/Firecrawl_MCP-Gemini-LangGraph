@@ -1,13 +1,14 @@
 """
-FastAPI Web Application: Firecrawl MCP & Gemini LangGraph Summarizer
+FastAPI Web Application: Firecrawl & Gemini LangGraph Summarizer
 Modern web arayüzü ve REST API sunucusu.
 """
 
 import os
 import json
 import uvicorn
+from contextlib import asynccontextmanager
 from typing import Optional
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -15,11 +16,22 @@ from fastapi.templating import Jinja2Templates
 from core import run_pipeline, validate_environment
 from config import DEFAULT_MODEL
 
+
+# --- Uygulama Yaşam Döngüsü ---
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Uygulama başlarken env değişkenlerini bir kez doğrular."""
+    validate_environment()
+    yield
+
+
 # FastAPI uygulamasını başlat
 app = FastAPI(
-    title="Firecrawl MCP & Gemini LangGraph Web Summarizer",
-    description="Model Context Protocol (MCP) ve LangGraph ile Otonom Web Kazıma ve Yapılandırılmış Özetleme API",
-    version="2.0.0"
+    title="Firecrawl & Gemini LangGraph Web Summarizer",
+    description="Firecrawl Python SDK ve LangGraph ile Otonom Web Kazıma ve Yapılandırılmış Özetleme API",
+    version="3.0.0",
+    lifespan=lifespan
 )
 
 # HTML Şablonları dizini
@@ -30,7 +42,10 @@ templates = Jinja2Templates(directory="templates")
 
 class SummarizeRequest(BaseModel):
     url: str = Field(..., description="Kazınacak ve özetlenecek tam web sayfası URL'si")
-    model: Optional[str] = Field(default=None, description="Kullanılacak Gemini modeli (boş bırakılırsa config.py'deki DEFAULT_MODEL kullanılır)")
+    model: Optional[str] = Field(
+        default=None,
+        description=f"Kullanılacak Gemini modeli (boş bırakılırsa varsayılan: {DEFAULT_MODEL})"
+    )
 
 
 # --- Endpointler ---
@@ -44,7 +59,7 @@ async def home_page(request: Request):
 @app.post("/summarize", response_class=JSONResponse)
 async def summarize_endpoint(req: SummarizeRequest):
     """
-    Gönderilen URL'yi LangGraph + Firecrawl MCP + Gemini hattında işler
+    Gönderilen URL'yi LangGraph + Firecrawl SDK + Gemini hattında işler
     ve yapılandırılmış özet + performans metriklerini döndürür.
     """
     url_str = req.url.strip()
@@ -88,6 +103,5 @@ async def get_benchmark_history():
 # --- Sunucuyu Başlatma ---
 
 if __name__ == "__main__":
-    # python app.py komutuyla doğrudan FastAPI & Uvicorn sunucusunu başlatır
     print("🌐 FastAPI Sunucusu Başlatılıyor: http://127.0.0.1:8000")
     uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
