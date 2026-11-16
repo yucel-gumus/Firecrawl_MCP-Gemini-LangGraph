@@ -110,7 +110,7 @@ let currentResultData = null;
                 if (typeof s === 'object' && s !== null) {
                     tr.innerHTML = `
                         <td style="font-weight: 600;">${escapeHtml(s.metric || '')}</td>
-                        <td style="font-weight: 700; color: #0f172a;">${escapeHtml(s.value || '')}</td>
+                        <td style="font-weight: 700; color: #253341;">${escapeHtml(s.value || '')}</td>
                         <td>${escapeHtml(s.context || '')}</td>
                     `;
                 } else {
@@ -119,7 +119,7 @@ let currentResultData = null;
                 pdfStatsTbody.appendChild(tr);
             });
             if (!currentResultData.statistics || currentResultData.statistics.length === 0) {
-                pdfStatsTbody.innerHTML = '<tr><td colspan="3" style="color: #94a3b8;">Metinde sayısal veri tespit edilmedi.</td></tr>';
+                pdfStatsTbody.innerHTML = '<tr><td colspan="3" style="color: #3E5164;">Metinde sayısal veri tespit edilmedi.</td></tr>';
             }
 
             // Findings
@@ -151,7 +151,7 @@ let currentResultData = null;
                     pdfEntities.appendChild(pill);
                 });
                 if (!currentResultData.entities_and_technologies || currentResultData.entities_and_technologies.length === 0) {
-                    pdfEntities.innerHTML = '<span style="font-size: 9.5px; color: #94a3b8;">Belirli bir varlık listelenmedi.</span>';
+                    pdfEntities.innerHTML = '<span style="font-size: 9.5px; color: #3E5164;">Belirli bir varlık listelenmedi.</span>';
                 }
             }
 
@@ -262,7 +262,7 @@ let currentResultData = null;
                     const tr = document.createElement('tr');
                     if (typeof s === 'object' && s !== null) {
                         tr.innerHTML = `
-                            <td style="font-weight: 600; color: #ffffff;">${escapeHtml(s.metric || 'Metrik')}</td>
+                            <td style="font-weight: 600; color: #253341;">${escapeHtml(s.metric || 'Metrik')}</td>
                             <td class="metric-badge-col">${escapeHtml(s.value || '')}</td>
                             <td>${escapeHtml(s.context || '')}</td>
                         `;
