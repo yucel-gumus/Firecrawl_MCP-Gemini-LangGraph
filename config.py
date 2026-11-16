@@ -202,12 +202,14 @@ def get_runtime_config(force: bool = False) -> dict[str, Any]:
 
 
 def normalize_thinking_level(model_name: str, level: str | None) -> str | None:
-    """Clamp thinking levels per Gemini 4 capabilities (XHIGH only on hydrogen)."""
+    """Clamp thinking levels for Gemini 4 models strictly to LOW, MEDIUM, or HIGH."""
     if not level or not str(model_name).startswith("gemini-4"):
         return None
-    upper = str(level).strip().upper()
-    if upper not in {"LOW", "MEDIUM", "HIGH", "XHIGH"}:
-        upper = "HIGH"
-    if upper == "XHIGH" and "hydrogen" not in str(model_name).lower():
-        upper = "HIGH"
-    return upper
+    raw = str(level).strip().upper()
+    if raw in {"XHIGH", "MAX"}:
+        return "HIGH"
+    if raw in {"MINIMAL", "OFF", "NONE"}:
+        return "LOW"
+    if raw in {"LOW", "MEDIUM", "HIGH"}:
+        return raw
+    return "HIGH"
