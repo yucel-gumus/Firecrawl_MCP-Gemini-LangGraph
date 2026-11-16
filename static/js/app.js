@@ -3,6 +3,15 @@ let currentResultData = null;
         let currentDurations = {};
         let currentStats = {};
 
+        function escapeHtml(val) {
+            return String(val ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function setUrl(url) {
             document.getElementById('url-input').value = url;
         }
@@ -16,11 +25,14 @@ let currentResultData = null;
             }, 2500);
         }
 
-        function switchTab(tabId) {
+        function switchTab(tabId, btnEl) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
 
-            event.target.classList.add('active');
+            const targetBtn = btnEl || (typeof event !== 'undefined' && event.target ? event.target : null);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
             const targetPane = document.getElementById(`tab-pane-${tabId}`);
             if (targetPane) {
                 targetPane.classList.add('active');
@@ -80,11 +92,11 @@ let currentResultData = null;
                 box.className = 'pdf-topic-card-print';
                 let subBullets = '';
                 (t.key_points || []).forEach(bp => {
-                    subBullets += `<li>${bp}</li>`;
+                    subBullets += `<li>${escapeHtml(bp)}</li>`;
                 });
                 box.innerHTML = `
-                    <div class="pdf-topic-name-print">${t.topic || 'Konu'}</div>
-                    <div class="pdf-topic-desc-print">${t.details || ''}</div>
+                    <div class="pdf-topic-name-print">${escapeHtml(t.topic || 'Konu')}</div>
+                    <div class="pdf-topic-desc-print">${escapeHtml(t.details || '')}</div>
                     <ul class="pdf-topic-bullets-print">${subBullets}</ul>
                 `;
                 pdfTopics.appendChild(box);
@@ -95,14 +107,14 @@ let currentResultData = null;
             pdfStatsTbody.innerHTML = '';
             (currentResultData.statistics || []).forEach(s => {
                 const tr = document.createElement('tr');
-                if (typeof s === 'object') {
+                if (typeof s === 'object' && s !== null) {
                     tr.innerHTML = `
-                        <td style="font-weight: 600;">${s.metric || ''}</td>
-                        <td style="font-weight: 700; color: #0f172a;">${s.value || ''}</td>
-                        <td>${s.context || ''}</td>
+                        <td style="font-weight: 600;">${escapeHtml(s.metric || '')}</td>
+                        <td style="font-weight: 700; color: #0f172a;">${escapeHtml(s.value || '')}</td>
+                        <td>${escapeHtml(s.context || '')}</td>
                     `;
                 } else {
-                    tr.innerHTML = `<td colspan="3">${s}</td>`;
+                    tr.innerHTML = `<td colspan="3">${escapeHtml(s)}</td>`;
                 }
                 pdfStatsTbody.appendChild(tr);
             });
@@ -230,11 +242,11 @@ let currentResultData = null;
                     card.className = 'topic-article-box';
                     let subBullets = '';
                     (t.key_points || []).forEach(p => {
-                        subBullets += `<li>${p}</li>`;
+                        subBullets += `<li>${escapeHtml(p)}</li>`;
                     });
                     card.innerHTML = `
-                        <div class="topic-article-name">${t.topic || 'Konu'}</div>
-                        <div class="topic-article-desc">${t.details || ''}</div>
+                        <div class="topic-article-name">${escapeHtml(t.topic || 'Konu')}</div>
+                        <div class="topic-article-desc">${escapeHtml(t.details || '')}</div>
                         <ul class="topic-sub-points">${subBullets}</ul>
                     `;
                     topicsContainer.appendChild(card);
@@ -248,14 +260,14 @@ let currentResultData = null;
                 statsTbody.innerHTML = '';
                 (currentResultData.statistics || []).forEach(s => {
                     const tr = document.createElement('tr');
-                    if (typeof s === 'object') {
+                    if (typeof s === 'object' && s !== null) {
                         tr.innerHTML = `
-                            <td style="font-weight: 600; color: #ffffff;">${s.metric || 'Metrik'}</td>
-                            <td class="metric-badge-col">${s.value || ''}</td>
-                            <td>${s.context || ''}</td>
+                            <td style="font-weight: 600; color: #ffffff;">${escapeHtml(s.metric || 'Metrik')}</td>
+                            <td class="metric-badge-col">${escapeHtml(s.value || '')}</td>
+                            <td>${escapeHtml(s.context || '')}</td>
                         `;
                     } else {
-                        tr.innerHTML = `<td colspan="3">${s}</td>`;
+                        tr.innerHTML = `<td colspan="3">${escapeHtml(s)}</td>`;
                     }
                     statsTbody.appendChild(tr);
                 });

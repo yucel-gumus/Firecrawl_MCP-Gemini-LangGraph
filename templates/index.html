@@ -61,7 +61,7 @@
         <div id="loading-view" class="loading-pane">
             <div class="progress-spinner"></div>
             <div class="loading-title-text">Sayfa Analiz Ediliyor</div>
-            <div class="loading-subtext">Firecrawl SDK saf metni kazıyor ve KENSAI derinlemesine
+            <div class="loading-subtext">Firecrawl SDK saf metni kazıyor ve Gemini 4 derinlemesine
                 sentezliyor...</div>
         </div>
 
@@ -135,12 +135,12 @@
 
             <!-- Section Navigation Tabs -->
             <div class="tabs-header-bar">
-                <button type="button" class="tab-btn active" onclick="switchTab('overview')">Genel Bakış & Özet</button>
-                <button type="button" class="tab-btn" onclick="switchTab('topics')">Konu Kırılımları</button>
-                <button type="button" class="tab-btn" onclick="switchTab('data')">Veri & İstatistik Tablosu</button>
-                <button type="button" class="tab-btn" onclick="switchTab('insights')">Bulgular & Aksiyon Planı</button>
-                <button type="button" class="tab-btn" onclick="switchTab('entities')">Bahsedilen Varlıklar</button>
-                <button type="button" class="tab-btn" onclick="switchTab('raw')">Ham JSON</button>
+                <button type="button" class="tab-btn active" onclick="switchTab('overview', this)">Genel Bakış & Özet</button>
+                <button type="button" class="tab-btn" onclick="switchTab('topics', this)">Konu Kırılımları</button>
+                <button type="button" class="tab-btn" onclick="switchTab('data', this)">Veri & İstatistik Tablosu</button>
+                <button type="button" class="tab-btn" onclick="switchTab('insights', this)">Bulgular & Aksiyon Planı</button>
+                <button type="button" class="tab-btn" onclick="switchTab('entities', this)">Bahsedilen Varlıklar</button>
+                <button type="button" class="tab-btn" onclick="switchTab('raw', this)">Ham JSON</button>
             </div>
 
             <!-- Tab 1: Overview & Executive Summary -->
@@ -254,7 +254,7 @@
             <div class="pdf-memo-header">
                 <div>
                     <div class="pdf-memo-title">WEB İÇERİK ANALİZ VE İSTİHBARAT RAPORU</div>
-                    <div class="pdf-memo-sub">Motor: Firecrawl SDK • Analiz Modeli: Google Gemini 3.6 Flash</div>
+                    <div class="pdf-memo-sub">Motor: Firecrawl SDK • Analiz Modeli: Google Gemini 4</div>
                 </div>
                 <div class="pdf-meta-col">
                     <div class="pdf-report-pill">RAPOR NO: <span id="pdf-report-id">001</span></div>

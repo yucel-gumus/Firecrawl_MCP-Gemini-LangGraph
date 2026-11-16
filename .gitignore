@@ -9,3 +9,4 @@ __pycache__/
 raw_scraped_content.txt
 web_summary.json
 benchmark_results.json
+.firebase/

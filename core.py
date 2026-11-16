@@ -22,7 +22,14 @@ from google import genai
 from google.genai import types
 from firecrawl import FirecrawlApp
 from langgraph.graph import StateGraph, START, END
-from config import DEFAULT_MODEL, FALLBACK_MODELS, LLM_TIMEOUT_MS, PIPELINE_TIMEOUT_S
+from config import (
+    DEFAULT_MODEL,
+    FALLBACK_MODELS,
+    LLM_TIMEOUT_MS,
+    PIPELINE_TIMEOUT_S,
+    get_runtime_config,
+    normalize_thinking_level,
+)
 
 # Ortam değişkenlerini yükle
 load_dotenv()
@@ -87,36 +94,37 @@ class PipelineState(TypedDict, total=False):
 
 def validate_environment() -> None:
     """Gerekli API anahtarlarını doğrular. Uygulama başlangıcında bir kez çağrılır."""
-    if not os.getenv("GEMINI_API_KEY"):
-        raise ValueError("Hata: GEMINI_API_KEY ortam değişkeni ayarlanmamış. Lütfen .env dosyanızı kontrol edin.")
-    if not os.getenv("FIRECRAWL_API_KEY"):
-        raise ValueError("Hata: FIRECRAWL_API_KEY ortam değişkeni ayarlanmamış. Lütfen .env dosyanızı kontrol edin.")
+    cfg = get_runtime_config()
+    if not cfg["gemini_keys"]:
+        raise ValueError("Hata: Gemini API anahtarı (Firestore veya GEMINI_API_KEY) yapılandırılmamış.")
+    if not cfg["firecrawl_api_key"]:
+        raise ValueError("Hata: Firecrawl API anahtarı (Firestore veya FIRECRAWL_API_KEY) yapılandırılmamış.")
 
 
-# --- 3. Singleton API Client'ları ---
-# Her istek için yeni client oluşturmak yerine modül seviyesinde bir kez oluşturulur.
+# --- 3. API Client Önbellekleri (Anahtar bazlı) ---
 
-_firecrawl_client: Optional[FirecrawlApp] = None
-_gemini_client: Optional[genai.Client] = None
-
-
-def get_firecrawl_client() -> FirecrawlApp:
-    """Firecrawl SDK client'ını singleton olarak döndürür."""
-    global _firecrawl_client
-    if _firecrawl_client is None:
-        _firecrawl_client = FirecrawlApp(api_key=os.getenv("FIRECRAWL_API_KEY", ""))
-    return _firecrawl_client
+_firecrawl_clients: dict[str, FirecrawlApp] = {}
+_gemini_clients: dict[str, genai.Client] = {}
 
 
-def get_gemini_client() -> genai.Client:
-    """Gemini API client'ını singleton olarak döndürür."""
-    global _gemini_client
-    if _gemini_client is None:
-        _gemini_client = genai.Client(
-            api_key=os.getenv("GEMINI_API_KEY", ""),
-            http_options=types.HttpOptions(timeout=LLM_TIMEOUT_MS)
+def get_firecrawl_client(api_key: str | None = None) -> FirecrawlApp:
+    """Aktif Firecrawl anahtarına göre Firecrawl SDK client'ını döndürür."""
+    key = (api_key if api_key is not None else get_runtime_config().get("firecrawl_api_key", "")).strip()
+    if key not in _firecrawl_clients:
+        _firecrawl_clients[key] = FirecrawlApp(api_key=key)
+    return _firecrawl_clients[key]
+
+
+def get_gemini_client(api_key: str | None = None) -> genai.Client:
+    """Verilen Gemini anahtarına göre GenAI client'ını döndürür."""
+    keys = get_runtime_config().get("gemini_keys", [])
+    key = (api_key if api_key is not None else (keys[0] if keys else "")).strip()
+    if key not in _gemini_clients:
+        _gemini_clients[key] = genai.Client(
+            api_key=key,
+            http_options=types.HttpOptions(timeout=LLM_TIMEOUT_MS),
         )
-    return _gemini_client
+    return _gemini_clients[key]
 
 
 # --- 4. Firecrawl Python SDK ile Kazıma ---
@@ -146,13 +154,16 @@ async def scrape_url_with_sdk(url: str) -> str:
 def extract_structured_summary(
     content: str,
     url: str,
-    preferred_model: str = DEFAULT_MODEL
+    preferred_model: str = ""
 ) -> WebSummary:
     """
     Google Gemini Chat API ile derinlemesine ve kapsamlı analiz yapar.
-    Birincil modelde hata olursa yedek modellere geçer.
+    Birincil model/anahtar hata verirse sırayla diğer anahtar ve modellere geçer.
     """
-    client = get_gemini_client()
+    cfg = get_runtime_config()
+    gemini_keys = cfg.get("gemini_keys", [])
+    if not gemini_keys:
+        raise RuntimeError("Gemini API anahtarı yapılandırılmamış.")
 
     prompt = f"""
 Sen dünya standartlarında kıdemli bir araştırma analisti, veri bilimci ve stratejistsin.
@@ -175,32 +186,49 @@ GÖREV TALİMATLARI:
 Lütfen yüzeysel veya kısa maddeler yerine, okuyucuya tam kapsamlı istihbarat sunacak zenginlikte yanıt ver.
 """
 
-    # Model isimleri config.py'den gelir — bu dosyada model adı YAZILMAZ
-    models_to_try = [preferred_model] if preferred_model else []
-    for m in FALLBACK_MODELS:
-        if m not in models_to_try:
+    primary_model = preferred_model or cfg.get("active_model") or DEFAULT_MODEL
+    fallback_chain = cfg.get("fallback_models") or FALLBACK_MODELS
+    thinking_level = cfg.get("thinking_level", "high")
+
+    models_to_try: list[str] = [primary_model]
+    for m in fallback_chain:
+        if m and m not in models_to_try:
             models_to_try.append(m)
 
-    last_err = None
+    last_err: Exception | None = None
     for model_name in models_to_try:
-        try:
-            # Chat API kullanımı: SDK'nın önerdiği yöntem (AFC uyarısını önler)
-            chat = client.chats.create(
-                model=model_name,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=WebSummary,
-                    temperature=0.1
+        norm_level = normalize_thinking_level(model_name, thinking_level)
+        cfg_kwargs: dict[str, Any] = {
+            "response_mime_type": "application/json",
+            "response_schema": WebSummary,
+        }
+        if str(model_name).startswith("gemini-4"):
+            if norm_level:
+                cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_level=norm_level)
+        else:
+            cfg_kwargs["temperature"] = 0.1
+
+        for key_idx, api_key in enumerate(gemini_keys):
+            client = get_gemini_client(api_key)
+            try:
+                chat = client.chats.create(
+                    model=model_name,
+                    config=types.GenerateContentConfig(**cfg_kwargs),
                 )
-            )
-            resp = chat.send_message(prompt)
-            return WebSummary.model_validate_json(resp.text)
-        except BrokenPipeError as exc:
-            last_err = exc
-            print(f"Bilgi: '{model_name}' bağlantı hatası (Broken Pipe), sonraki modele geçiliyor...", file=sys.stderr)
-        except Exception as exc:
-            last_err = exc
-            print(f"Bilgi: '{model_name}' geçici yanıt vermedi, sonraki modele geçiliyor... ({type(exc).__name__})", file=sys.stderr)
+                resp = chat.send_message(prompt)
+                return WebSummary.model_validate_json(resp.text)
+            except BrokenPipeError as exc:
+                last_err = exc
+                print(
+                    f"Bilgi: '{model_name}' [key_{key_idx + 1}] bağlantı hatası (Broken Pipe), sonraki deneniyor...",
+                    file=sys.stderr,
+                )
+            except Exception as exc:
+                last_err = exc
+                print(
+                    f"Bilgi: '{model_name}' [key_{key_idx + 1}] yanıt vermedi ({type(exc).__name__}), sonraki deneniyor...",
+                    file=sys.stderr,
+                )
 
     raise RuntimeError(f"Tüm modeller denendi fakat yanıt alınamadı. Son hata: {last_err}")
 
