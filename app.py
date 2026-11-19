@@ -3,6 +3,7 @@ FastAPI Web Application: Firecrawl & Gemini LangGraph Summarizer
 Modern web arayüzü ve REST API sunucusu.
 """
 
+import asyncio
 import logging
 import os
 import threading
@@ -10,6 +11,8 @@ import time
 from collections import deque
 from contextlib import asynccontextmanager
 from typing import Optional
+from urllib.parse import urlparse
+import httpx
 import uvicorn
 from pydantic import BaseModel, Field, HttpUrl
 from fastapi import FastAPI, Request, HTTPException
@@ -38,6 +41,45 @@ def _client_ip(request: Request) -> str:
         if parts:
             return parts[-1]
     return request.client.host if request.client else "unknown"
+
+
+_TELEMETRY_URL = "https://python-backend-270384591051.europe-west3.run.app/api/telemetry/event"
+_telemetry_tasks: set[asyncio.Task] = set()
+
+
+async def _notify_telemetry(client_ip: str, action: str, detail: str) -> None:
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            await client.post(
+                _TELEMETRY_URL,
+                headers={
+                    "Content-Type": "application/json",
+                    "Origin": "https://firecrawl-mcp.web.app",
+                    "User-Agent": "YucelTelemetryServer/firecrawl-ai-summarizer",
+                },
+                json={
+                    "project": "firecrawl-ai-summarizer",
+                    "event": "action",
+                    "action": action,
+                    "detail": detail[:80],
+                    "path": "/summarize",
+                    "source": "server",
+                    "client_ip": client_ip,
+                },
+            )
+    except Exception:
+        pass
+
+
+def _spawn_telemetry(request: Request, action: str, detail: str) -> None:
+    if os.getenv("PYTEST_CURRENT_TEST"):
+        return
+    host = (request.headers.get("host") or "").lower()
+    if not host or host.startswith("localhost") or host.startswith("127.0.0.1"):
+        return
+    task = asyncio.create_task(_notify_telemetry(_client_ip(request), action, detail))
+    _telemetry_tasks.add(task)
+    task.add_done_callback(_telemetry_tasks.discard)
 
 
 def _is_rate_limited(ip: str, limit: int) -> bool:
@@ -166,6 +208,8 @@ async def summarize_endpoint(req: SummarizeRequest, request: Request):
             status_code=400,
             detail=f"Geçersiz model: '{model_name}'. İzin verilen modeller: {', '.join(allowed_models)}"
         )
+
+    _spawn_telemetry(request, "summarize", urlparse(url_str).netloc or url_str)
 
     try:
         result = await run_pipeline(

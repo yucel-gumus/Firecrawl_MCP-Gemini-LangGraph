@@ -3,6 +3,33 @@ let currentResultData = null;
         let currentDurations = {};
         let currentStats = {};
 
+        (function trackFirecrawlVisit() {
+            if (typeof window === 'undefined') return;
+            if (window.location.protocol !== 'https:') return;
+            if (['localhost', '127.0.0.1'].includes(window.location.hostname)) return;
+            if (navigator.webdriver) return;
+            try {
+                if (window.sessionStorage.getItem('yg_telemetry_visit_v1')) return;
+                window.sessionStorage.setItem('yg_telemetry_visit_v1', '1');
+            } catch {
+                // ignore storage errors
+            }
+            const url = 'https://python-backend-270384591051.europe-west3.run.app/api/telemetry/event';
+            const body = JSON.stringify({
+                project: 'firecrawl-ai-summarizer',
+                event: 'visit',
+                path: window.location.pathname,
+                referrer: document.referrer || '',
+                source: 'client',
+            });
+            try {
+                if (typeof navigator.sendBeacon === 'function' && navigator.sendBeacon(url, body)) return;
+                void fetch(url, { method: 'POST', body, keepalive: true }).catch(() => {});
+            } catch {
+                // ignore telemetry errors
+            }
+        })();
+
         function escapeHtml(val) {
             return String(val ?? '')
                 .replace(/&/g, '&amp;')
